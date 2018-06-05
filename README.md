@@ -4,6 +4,8 @@ Build an RNA-Seq processing pipeline that converts sequencing reads to RNA level
 **Proposed Softwares**  
 * STAR
 * Kallisto
+* trimmomatic
+* RNA-SEQC
 
 **Test Data**
 * 1000 Genomes project
