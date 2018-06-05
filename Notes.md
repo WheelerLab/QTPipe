@@ -1,4 +1,4 @@
-#### Test Data
+## Test Data
 
 **transcript reference file**  
 gencode.v28.transcripts.fa.gz ~65MB  
@@ -12,9 +12,11 @@ wget "ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_28/gencode
 * fastq read files were taken from the lab directory /homes/wheelerlab2/Data/gEUVADIS_RNASeq  
 
 ## Kallisto
-
+current version 0.44.0  
+  
 **references**  
 https://pachterlab.github.io/kallisto/  
+  
 **Kallisto installation**  
 requires conda installed and the bioconda channel be opened
 
@@ -31,7 +33,8 @@ conda install kallisto
 * Initial testing was run on the using the transcript fastq file taken from the GENCODE project, see **Test Data** for download instructions
 * Paired reads ERR188030_1.fastq.gz (1151 MB) and ERR188030_2.fastq.gz (1136 MB) were used to test this data
 
-1. Creating an index file  
+1. Creating an index file   
+Kallisto requires the proccessing of a transcriptome file. This is a one time process for a given reference file and should only take up to 10 minutes.
 ```bash
 kallisto index -i name_of_index_file.idx gencode.v28.transcripts.fa.gz
 ```
@@ -47,7 +50,12 @@ kallisto index -i name_of_index_file.idx gencode.v28.transcripts.fa.gz
 * Runtime without bootstrap (-b 0 is the default) 2m37s
 * Manual notes it is possible to increase the runtime by up to 15% but this has not been explored
 * Note: read files may not be in a different directory than the wd. Typing out the full PATH to these items resolves this, but is not optimal.
-* Note: Uncertain if kallisto has the ability to name the output files for this step may interfere with downstream processing - may be adequate to name a unique directory for each output but not optimal
+* Note: Uncertain if kallisto has the ability to name the output files for this step may interfere with downstream processing - may be adequate to name a unique directory for each output but not optimal  
+  
+should be possible to assign genomic coordinates to the transcripts - possible solution to reads per gene question?
 
 
 ## STAR
+* Note: STAR does perform WASP filtering - appends a tag to the end of alignments indicating whether it passed or failed.
+  * Need to check if this requires WASP installation or if this feature is built in   
+remains to be tested - couldn't download GENCODE test files due to connection refusal error
