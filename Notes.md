@@ -1,12 +1,20 @@
 ## Test Data
 
-**transcript reference file**  
+**Transcript reference file**  
 gencode.v28.transcripts.fa.gz ~65MB  
 Downloaded from GENCODE release 28 (GRCh38.p12)  
 ```bash
 wget "ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_28/gencode.v28.annotation.gtf.gz"
 ```
 * Note: refused connection error being encountered, currently unresolved  
+
+**Genome reference file**  
+GRCh38.primary_assembly.genome.fa.gz ~840MB  
+Downloaded from GENCODE release 28 (GRCh38.p12)  
+```bash
+wget "ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_28/GRCh38.primary_assembly.genome.fa.gz"
+```
+
 
 **Paired read files**  
 * fastq read files were taken from the lab directory /homes/wheelerlab2/Data/gEUVADIS_RNASeq  
@@ -56,6 +64,28 @@ should be possible to assign genomic coordinates to the transcripts - possible s
 
 
 ## STAR
+version 2.6.0c   
+
+**Running Star** 
+
+1. Creating an index file  
+first create a directory to place the index file
+```bash
+mkdir STAR_out
+```
+Next, STAR will not accept compressed genome files as input, unzip the reference genome with zcat or gunzip -c and append it to a new file.   
+```bash
+gunzip -c GRCh38.primary_assembly.genome.fa.gz > GRCh38.primary_assembly.genome.fa
+```
+Next create the index file   
+```bash 
+STAR --runMode genomeGenerate --genomeDir STAR_out --genomeFastaFiles Data/Gencode/GRCh38.primary_assembly.fa
+```
+* Note: This process takes a long time recommended that it's run with nohup or similar. To time with nohup run as follows
+```bash
+nohup bash -c "time STAR --runMode genomeGenerate --genomeDir STAR_out --genomeFastaFiles Data/Gencode/GRCh38.primary_assembly.fa"
+```
+
 * Note: STAR does perform WASP filtering - appends a tag to the end of alignments indicating whether it passed or failed.
   * Need to check if this requires WASP installation or if this feature is built in   
 remains to be tested - couldn't download GENCODE test files due to connection refusal error
