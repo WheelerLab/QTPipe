@@ -1,3 +1,4 @@
+
 ## Test Data
 
 **Transcript reference file**  
@@ -89,3 +90,32 @@ nohup bash -c "time STAR --runMode genomeGenerate --genomeDir STAR_out --genomeF
 * Note: STAR does perform WASP filtering - appends a tag to the end of alignments indicating whether it passed or failed.
   * Need to check if this requires WASP installation or if this feature is built in   
 remains to be tested - couldn't download GENCODE test files due to connection refusal error
+
+## Useful commands
+
+bash commands
+```bash
+wget "some_url_here" #retrieve data from a url
+
+nohup your_commands_here --whatever --arguments #continues to run the process even if you leave the server
+
+nohup taskset -c some_number your_command_here #runs your command on a specific core Note wheeler lab has 12 (0-11) cores
+
+some_command & #runs command in the background
+
+bash -c "Command_as_string" #interprets the string input as bash command with spaces delimiting positional arguments"
+
+time Some_command #times how long it takes to execute Note does not work with nohup unless used in conjunction with bash -c
+
+top #displays what processes are running typing 1 will display core use
+
+`ps aux --sort=-%mem | head` #To see which processes are using the most memory:
+
+#To free up memory, run these commands:
+sync
+su
+echo 3 > /proc/sys/vm/drop_caches
+
+//useful combination
+nohup taskset -c # bash -c "time Some_Command --argument &" //runs your job in the background on a specified core, times it , and doesn't terminate when you leave the shell
+```
