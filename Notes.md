@@ -38,11 +38,11 @@ conda install kallisto
 * Note: permission denied error encountered, resolved by running these commands with **sudo**  
 * Note: conda is not currently in the PATH. Typing out the full path to conda resolves this, but is not optimal.
 
-**running Kallisto**  
+###running Kallisto  
 * Initial testing was run on the using the transcript fastq file taken from the GENCODE project, see **Test Data** for download instructions
 * Paired reads ERR188030_1.fastq.gz (1151 MB) and ERR188030_2.fastq.gz (1136 MB) were used to test this data
 
-1. Creating an index file   
+####1. Creating an index file  
 Kallisto requires the proccessing of a transcriptome file. This is a one time process for a given reference file and should only take up to 10 minutes.
 ```bash
 kallisto index -i name_of_index_file.idx gencode.v28.transcripts.fa.gz
@@ -51,7 +51,12 @@ kallisto index -i name_of_index_file.idx gencode.v28.transcripts.fa.gz
 * Name of index file should be established here and used from this point on for .idx arguments
 * Note: Kallisto and transcript file are not currently in the PATH. Typing out the full PATH to these items resolves this, but is not optimal.
 
-2. Quantifying transcript abundances
+**Creating an index file using a genome reference file**
+Should be the same as creating an index file, just supply a genome file in place of the transcript file
+* Important: Significant server delays were experienced during this, process do not attempt to run multiple jobs unless you want the server to be unuseable for a while
+* May be dependent on the size of your reference file as this process uses significant memory
+
+####2. Quantifying transcript abundances
  ```bash
  kallisto quant -i name_of_index_file.idx -o output_directory -b 100 ERR188030_1.fastq.gz ERR188030_2.fastq.gz
  ```
