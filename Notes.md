@@ -38,11 +38,11 @@ conda install kallisto
 * Note: permission denied error encountered, resolved by running these commands with **sudo**  
 * Note: conda is not currently in the PATH. Typing out the full path to conda resolves this, but is not optimal.
 
-###running Kallisto  
+**running Kallisto**  
 * Initial testing was run on the using the transcript fastq file taken from the GENCODE project, see **Test Data** for download instructions
 * Paired reads ERR188030_1.fastq.gz (1151 MB) and ERR188030_2.fastq.gz (1136 MB) were used to test this data
 
-####1. Creating an index file  
+**1. Creating an index file**  
 Kallisto requires the proccessing of a transcriptome file. This is a one time process for a given reference file and should only take up to 10 minutes.
 ```bash
 kallisto index -i name_of_index_file.idx gencode.v28.transcripts.fa.gz
@@ -51,12 +51,7 @@ kallisto index -i name_of_index_file.idx gencode.v28.transcripts.fa.gz
 * Name of index file should be established here and used from this point on for .idx arguments
 * Note: Kallisto and transcript file are not currently in the PATH. Typing out the full PATH to these items resolves this, but is not optimal.
 
-**Creating an index file using a genome reference file**
-Should be the same as creating an index file, just supply a genome file in place of the transcript file
-* Important: Significant server delays were experienced during this, process do not attempt to run multiple jobs unless you want the server to be unuseable for a while
-* May be dependent on the size of your reference file as this process uses significant memory
-
-####2. Quantifying transcript abundances
+**2. Quantifying transcript abundances**
  ```bash
  kallisto quant -i name_of_index_file.idx -o output_directory -b 100 ERR188030_1.fastq.gz ERR188030_2.fastq.gz
  ```
@@ -68,16 +63,23 @@ Should be the same as creating an index file, just supply a genome file in place
   
 should be possible to assign genomic coordinates to the transcripts - possible solution to reads per gene question?
 
+**Transcript abundances with multiple paired fastq files**
+This process should be near identical to normal quantification.   
+* Important note: only supply one sample at a time to kallisto. The multiple FASTQ (pair) option is for users who have samples that span multiple FASTQ files. If supplied with multiple FastQ files at a time Kallisto will simply treat them each as one sample  
+Kallisto should then be able to run on multiple samples by scripting bash looping
+* Note: Error with bootstrap encountered when supplying multiple fastq files at once, but is not relevant with the looping solution.
 
-## STAR
+* Code not yet written
+
+## STAR & RSEM
 version 2.6.0c   
 
 **Running Star** 
 
-1. Creating an index file  
+**1. Creating an index file**  
 first create a directory to place the index file
 ```bash
-mkdir STAR_out
+mkdir StarTest
 ```
 Next, STAR will not accept compressed genome files as input, unzip the reference genome with zcat or gunzip -c and append it to a new file.   
 ```bash
@@ -85,17 +87,37 @@ gunzip -c GRCh38.primary_assembly.genome.fa.gz > GRCh38.primary_assembly.genome.
 ```
 Next create the index file   
 ```bash 
-STAR --runMode genomeGenerate --genomeDir STAR_out --genomeFastaFiles Data/Gencode/GRCh38.primary_assembly.fa
+STAR --runMode genomeGenerate --genomeDir StarTest --genomeFastaFiles Data/Gencode/GRCh38.primary_assembly.fa
 ```
 * Note: This process takes a long time recommended that it's run with nohup or similar. To time with nohup run as follows
 ```bash
-nohup bash -c "time STAR --runMode genomeGenerate --genomeDir STAR_out --genomeFastaFiles Data/Gencode/GRCh38.primary_assembly.fa"
+nohup bash -c "time STAR --runMode genomeGenerate --genomeDir StarTest --genomeFastaFiles Data/Gencode/GRCh38.primary_assembly.fa"
 ```
+* Approximate time 112m
 
+**2.Map the gzipped FASTQ files outputting unsorted and coordinate-sorted BAMs**  
+\* This process was taken from Alternate Protocol 7 of Dobin & Gingeras (2016)  
+[Mapping RNA-Seq Reads with STAR](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4631051/)
+* Requires a gtf file
+  * Should be possible to directly pass STAR the transcript file in place of the genome file and gtf file but this has not been tested
+
+```bash
+STAR --genomeDir ~/StarTest/ --sjdbGRFfile ~/DATA/GenCode/gencode.v28.annotations.gtf --readFilesIn /home/wheelerlab2/Data/gEUVADIS_RNASeq/ERR188030_1.fa.gz /home/wheelerlab2/Data/gEUVADIS_RNASeq/ERR188030_2.fa.gz --readFilesCommand zcat --quantMode TranscriptomeSAM
+```
+ * Time for this process on one pair of fastq files: 26m7.41s
+ **3. Prepare the RSEM reference files**
+ 
+ ```bash
+ ~/RSEM/rsem-prepare-reference --gtf ~/DATA/GenCode/gencode.v28.annotations.gtf ~/DATA/GenCode/GRCh38.primary_assembly.genome.fa ~/RSEM/ref
+ ```
+ 
 * Note: STAR does perform WASP filtering - appends a tag to the end of alignments indicating whether it passed or failed.
   * Need to check if this requires WASP installation or if this feature is built in   
-remains to be tested - couldn't download GENCODE test files due to connection refusal error
 
+**4. Run RSEM quantification on the STAR transcriptomic BAM file**
+```bash
+~/RSEM/rsem-calculate-expression --bam --no-bam-output -p 12 --paired-end --forwardprob 0 ~/transcriptStar_out/Aligned.toTranscriptome.out.bam ~/RSEM/ref ~/transcriptStar_out/Quant >& ~/transcriptStar_out/rsem.log
+```
 ## Useful commands
 
 bash commands
