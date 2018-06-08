@@ -119,6 +119,8 @@ STAR --genomeDir ~/StarTest/ --sjdbGRFfile ~/DATA/GenCode/gencode.v28.annotation
 ```bash
 ~/RSEM/rsem-calculate-expression --bam --no-bam-output -p 12 --paired-end --forwardprob 0 ~/transcriptStar_out/Aligned.toTranscriptome.out.bam ~/RSEM/ref ~/transcriptStar_out/Quant >& ~/transcriptStar_out/rsem.log
 ```
+* Approximate time 106m53.44s
+
 ## Useful commands
 
 bash commands
