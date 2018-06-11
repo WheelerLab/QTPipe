@@ -125,6 +125,10 @@ STAR --genomeDir ~/StarTest/ --sjdbGRFfile ~/DATA/GenCode/gencode.v28.annotation
 
 bash commands
 ```bash
+/usr/local/bin/anaconda3/bin/python3 #path to python3 on wheeler lab
+
+chmod a+x script_name #mak ea custom script executable
+
 wget "some_url_here" #retrieve data from a url
 
 nohup your_commands_here --whatever --arguments #continues to run the process even if you leave the server
