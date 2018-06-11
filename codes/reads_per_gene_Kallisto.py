@@ -21,7 +21,7 @@ with open(args.transcript_Abundance, 'r') as abundance:
 
 with open(args.Gene_abundance_out, 'w') as output:
 	output.write('Gene_ID\tTransctipt_ID(s)\test_counts\ttpm\n') #write out header
-	for key in genes.keys():#now write out the four fields
+	for key in sorted(genes.keys()):#now write out the four fields
 		output.write(key + '\t')
 		output.write(genes[key][0] + '\t')
 		output.write(str(genes[key][1]) + '\t')
