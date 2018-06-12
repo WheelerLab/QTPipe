@@ -1,0 +1,21 @@
+#!/bin/bash
+
+FastqDir=$1
+
+if [ -e fastq_list.txt ]
+then
+	rm fastq_list.txt
+fi 
+for file in `ls ${FastqDir}*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | head`
+do
+	echo $file >> fastq_list.txt
+done
+
+cat fastq_list.txt | while read fastq 
+if [ -e $fastq ]
+then
+	rm -r $fastq
+fi
+do 
+	/usr/local/bin/anaconda2/bin/kallisto quant -i ~/transcripts.idx -o ./$fastq -b 100 ${FastqDir}${fastq}* 
+done
