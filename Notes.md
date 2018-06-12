@@ -117,7 +117,7 @@ STAR --genomeDir ~/StarTest/ --sjdbGRFfile ~/DATA/GenCode/gencode.v28.annotation
 
 **4. Run RSEM quantification on the STAR transcriptomic BAM file**
 ```bash
-~/RSEM/rsem-calculate-expression --bam --no-bam-output -p 12 --paired-end --forwardprob 0 ~/transcriptStar_out/Aligned.toTranscriptome.out.bam ~/RSEM/ref ~/transcriptStar_out/Quant >& ~/transcriptStar_out/rsem.log
+~/RSEM/rsem-calculate-expression --bam --no-bam-output -p 12 --paired-end --forward-prob 0 ~/transcriptStar_out/Aligned.toTranscriptome.out.bam ~/RSEM/ref ~/transcriptStar_out/Quant >& ~/transcriptStar_out/rsem.log
 ```
 * Approximate time 106m53.44s
 
