@@ -68,9 +68,9 @@ kallisto index -i name_of_index_file.idx gencode.v28.transcripts.fa.gz
 ```
 * Index generation should always be performed prior to this
 * Code should be updated to ask if this index has been generated yet
-* Code should also be updated to call the reads_per_gene_kallisto.py after each run
+* Code calls the reads_per_gene_kallisto.py after each loop
 * Currently this code is oriented to only perform on the first 10 sample pairs in a library but can be easily updated
-* currently does not generate bamfiles but can be easily altered in code - update as user option?
+* currently does generate bamfiles - update as user option?
 * Uses a default bootstrap of 100 - can be easily changed within code - update as user option?
 
 Speeds at different levels of bootstrap using 10 sample pairs
