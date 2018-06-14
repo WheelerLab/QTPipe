@@ -43,7 +43,7 @@ conda install kallisto
 * Paired reads ERR188030_1.fastq.gz (1151 MB) and ERR188030_2.fastq.gz (1136 MB) were used to test this data
 
 **1. Creating an index file**  
-Kallisto requires the proccessing of a transcriptome file. This is a one time process for a given reference file and should only take up to 10 minutes.
+Index generation is  a single step that should be a one time process for a given reference file. Should always be performed prior to the rest of the transcriptome quantification. This is a one time process for a given reference file and should only take up to 10 minutes.
 ```bash
 kallisto index -i name_of_index_file.idx gencode.v28.transcripts.fa.gz
 ```
@@ -51,25 +51,39 @@ kallisto index -i name_of_index_file.idx gencode.v28.transcripts.fa.gz
 * Name of index file should be established here and used from this point on for .idx arguments
 * Note: Kallisto and transcript file are not currently in the PATH. Typing out the full PATH to these items resolves this, but is not optimal.
 
-**2. Quantifying transcript abundances**
+**2a. Quantifying transcript abundances**
  ```bash
  kallisto quant -i name_of_index_file.idx -o output_directory -b 100 ERR188030_1.fastq.gz ERR188030_2.fastq.gz
  ```
 * Runtime with bootstrap = 100 (-b 100) 42m47s
 * Runtime without bootstrap (-b 0 is the default) 2m37s
 * Manual notes it is possible to increase the runtime by up to 15% but this has not been explored
-* Note: read files may not be in a different directory than the wd. Typing out the full PATH to these items resolves this, but is not optimal.
+* Note: read files may be in a different directory than the wd. Typing out the full PATH to these items resolves this, but is not optimal.
 * Note: Uncertain if kallisto has the ability to name the output files for this step may interfere with downstream processing - may be adequate to name a unique directory for each output but not optimal  
   
-should be possible to assign genomic coordinates to the transcripts - possible solution to reads per gene question?
+**2b. Looping kallisto quantification**
 
-**Transcript abundances with multiple paired fastq files**
-This process should be near identical to normal quantification.   
-* Important note: only supply one sample at a time to kallisto. The multiple FASTQ (pair) option is for users who have samples that span multiple FASTQ files. If supplied with multiple FastQ files at a time Kallisto will simply treat them each as one sample  
-Kallisto should then be able to run on multiple samples by scripting bash looping
-* Note: Error with bootstrap encountered when supplying multiple fastq files at once, but is not relevant with the looping solution.
+```bash
+./loop_kallisto /path/to/fastq/directory/
+```
+* Index generation should always be performed prior to this
+* Code should be updated to ask if this index has been generated yet
+* Code should also be updated to call the reads_per_gene_kallisto.py after each run
+* Currently this code is oriented to only perform on the first 10 sample pairs in a library but can be easily updated
+* currently does not generate bamfiles but can be easily altered in code - update as user option?
+* Uses a default bootstrap of 100 - can be easily changed within code - update as user option?
 
-* Code not yet written
+Speeds at different levels of bootstrap using 10 sample pairs
+* @bootstrap = 0, run time = 47m30s
+* @bootstrap = 10, run time = 99m11s
+* @bootstrap = 100, run time = 531m41s
+
+**3. Quantifying gene abundance**
+```bash
+python3 reads_per_gene_kallisto.py /path/to/abundance.tsv /desired/output/path/out_name.tsv
+```
+* Does not currently have default arguments - can either be added or simply fed withing loop_kallisto
+* Number of bootstraps does not affect TPM only accuracy estimates
 
 ## STAR & RSEM
 version 2.6.0c   
@@ -142,6 +156,8 @@ bash -c "Command_as_string" #interprets the string input as bash command with sp
 time Some_command #times how long it takes to execute Note does not work with nohup unless used in conjunction with bash -c
 
 top #displays what processes are running typing 1 will display core use
+
+kill -9 PID #kill a process using its pid number
 
 `ps aux --sort=-%mem | head` #To see which processes are using the most memory:
 
