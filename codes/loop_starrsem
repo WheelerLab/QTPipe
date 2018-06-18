@@ -1,0 +1,31 @@
+#!/bin/bash
+
+FastqDir=$1
+
+if [ -e fastq_list_star.txt ] #remove any files with this name to start with
+then
+	rm fastq_list_star.txt 
+fi 
+for file in `ls ${FastqDir}*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | head` #generate a list of fastq files 
+do
+	echo $file >> fastq_list_star.txt
+done
+
+#STAR indexing will go here
+#rsem reference file generation will go here
+
+cat fastq_list_star.txt | while read fastq #iterate through the list
+do
+if [ -e ${fastq}_starrsem ]
+then
+	rm -r ${fastq}_starrsem #remove any folders that might have this name
+fi
+if [ -e rsem.log ]
+then
+	rm rsem.log #remove any rsem og there might b
+fi
+	mkdir ~/${fastq}_starrsem #make the directory
+	cd ~/${fastq}_starrsem #go to that directory
+	STAR --genomeDir ~/StarTest/ --sjdbGTFfile ~/DATA/GenCode/gencode.v28.annotation.gtf --readFilesIn ${FastqDir}${fastq}* --readFilesCommand zcat --quantMode TranscriptomeSAM #run the star mapping 
+	~/RSEM/rsem-calculate-expression --bam --no-bam-output -p 12 --paired-end --forward-prob 0 ~/${fastq}_starrsem/Aligned.toTranscriptome.out.bam ~/RSEM/ref ~/${fastq}_starrsem/Quant >& ~/${fastq}_starrsem/rsem.log #perform rsem quantification 
+done
