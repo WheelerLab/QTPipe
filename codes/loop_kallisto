@@ -1,21 +1,27 @@
 #!/bin/bash
 
-FastqDir=$1
+FastqDir=$1 #needs directory containing the fastq files as input
 
-if [ -e fastq_list.txt ]
+if [ -e fastq_list.txt ] #remove any file with this name at the start
 then
 	rm fastq_list.txt
 fi 
-for file in `ls ${FastqDir}*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | head`
+for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head` #generate fastq list from scratch
 do
-	echo $file >> fastq_list.txt
+	echo "$file" >> fastq_list.txt #write just the primary tag
 done
 
-cat fastq_list.txt | while read fastq 
-if [ -e $fastq ]
+#user input should go around here
+#has an index file been created yet?
+#or we can have the initial input be a flag somehow?
+
+cat fastq_list.txt | while read fastq #now iterate through the list of fastq files
+if [ -e "$fastq" ]
 then
-	rm -r $fastq
+	rm -r "$fastq" #if a directory with the fastq name already exists rm it to avoid colisions
 fi
 do 
-	/usr/local/bin/anaconda2/bin/kallisto quant -i ~/transcripts.idx -o ./$fastq -b 100 ${FastqDir}${fastq}* 
+	/usr/local/bin/anaconda2/bin/kallisto quant -i ~/transcripts.idx -o ./"${fastq}" -b 100 "${FastqDir}""${fastq}"* #run kallisto quantification on each paired file 
+	/usr/local/bin/anaconda3/bin/python3 ~/scripts/reads_per_gene_Kallisto.py ~/"${fastq}"/abundanve.tsv ~/"${fastq}"/Gene_abundance.tsv
+
 done
