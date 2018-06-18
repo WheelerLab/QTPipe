@@ -10,13 +10,13 @@ PATH=$PATH:$LeafcutterLoc/scripts
 #fi 
 cat fastq_list.txt | while read fastq
 do         
-	echo Converting "${fastq}" pseudoaligned bamfile to "${fastq}.junc"
-	sh "$LeafcutterLoc"/scripts/bam2junc.sh ~/"${fastq}_0"/pseudoalignments.bam ~/"${fastq}_0"/"${fastq}.pseudoaligned.junc"
+	echo Converting "${fastq}" pseudoaligned bamfile to "${fastq}.pseudoaligned.junc"
+	sh $LeafcutterLoc/scripts/bam2junc.sh ~/"${fastq}_0"/pseudoalignments.bam ~/"${fastq}_0"/"${fastq}.pseudoaligned.junc"
 	echo "${fastq}.pseudoaligned.junc" >> ~/juncfiles.txt
 
 	echo Converting "${fastq}" STAR aligned bamfile to "${fastq}.starlaligned.junc"
-	sh $LeafcutterLoc/scripts/bam2junc.sh ~/"${fastq}_starrsem"/Aligned.out.bam ~/"${fastq}_starrsem"/"${fastq}.staraligned.bam"
-	echo "${fastq}.staraligned.bam" >> ~/juncfiles.txt
+	sh $LeafcutterLoc/scripts/bam2junc.sh ~/"${fastq}_starrsem"/Aligned.out.bam ~/"${fastq}_starrsem"/"${fastq}.staraligned.junc"
+	echo "${fastq}.staraligned.junc" >> ~/juncfiles.txt
 done
 
 #python $LeafcutterLoc/clustering/leafcutter_cluster.py -j juncfiles.txt -m 50 -o testYRIvsEU -l 500000
