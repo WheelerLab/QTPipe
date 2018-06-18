@@ -158,6 +158,7 @@ time Some_command #times how long it takes to execute Note does not work with no
 top #displays what processes are running typing 1 will display core use
 
 kill -9 PID #kill a process using its pid number
+kill -9 $(pgrep -f command_name) #useful for commands that execute loops - exits the whole loop not just one iteration
 
 `ps aux --sort=-%mem | head` #To see which processes are using the most memory:
 
@@ -168,4 +169,53 @@ echo 3 > /proc/sys/vm/drop_caches
 
 //useful combination
 nohup taskset -c # bash -c "time Some_Command --argument &" //runs your job in the background on a specified core, times it , and doesn't terminate when you leave the shell
+```
+## Bash Scripting Tips & Tricks     
+
+**setting default arguments for options**
+
+```bash
+LINES=50       # Default number of lines saved.
+
+if [ -n "$1" ]
+# Test whether command-line argument is present (non-empty).
+then
+  lines=$1
+else  
+  lines=$LINES # Default, if not specified on command-line.
+fi  
+```
+
+**Double quote your variables**
+```bash
+"${var}"
+```
+Prevents misinterpretation of special characters and values containing spaces
+
+**$ argument interpolation**     
+
+```bash
+echo "Last program's return value: $?"
+echo "Script's PID: $$"
+echo "Number of arguments passed to script: $#"
+echo "All arguments passed to script: $@"
+echo "Script's arguments separated into different variables: $1 $2..."
+```
+
+**check the number of arguments is correct**    
+```bash
+E_WRONG_ARGS=85
+script_parameters="-a -h -m -z"
+#                  -a = all, -h = help, etc.
+
+if [ $# -ne $Number_of_expected_args ]
+then
+  echo "Usage: `basename $0` $script_parameters"
+  # `basename $0` is the script's filename.
+  exit $E_WRONG_ARGS
+fi
+```
+**reading user input**
+```bash
+read variable_name #Read one line from the standard input, (or from a file) and assign the word(s) to variable name(s).
 ```
