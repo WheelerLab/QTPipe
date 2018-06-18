@@ -1,7 +1,7 @@
 #!/bin/bash
 
-Bamlocation=$1
-LeafcutterLoc=$2
+#Bamlocation=$1
+LeafcutterLoc=$1
 PATH=$PATH:$LeafcutterLoc/scripts
 
 if [ -e  fastq_list_ #juncfiles.txt ]
@@ -11,7 +11,7 @@ if [ -e  fastq_list_ #juncfiles.txt ]
 cat fastq_list.txt | while read fastq
 do         
 	echo Converting "${fastq}" pseudoaligned bamfile to "${fastq}.junc"
-	sh $LeafcutterLoc/scripts/bam2junc.sh ~/"${fastq}_0"/pseudoalignments.bam ~/"${fastq}_0"/"${fastq}.pseudoaligned.junc"
+	sh "$LeafcutterLoc"/scripts/bam2junc.sh ~/"${fastq}_0"/pseudoalignments.bam ~/"${fastq}_0"/"${fastq}.pseudoaligned.junc"
 	echo "${fastq}.pseudoaligned.junc" >> ~/juncfiles.txt
 
 	echo Converting "${fastq}" STAR aligned bamfile to "${fastq}.starlaligned.junc"
