@@ -54,9 +54,12 @@ kallisto index -i name_of_index_file.idx gencode.v28.transcripts.fa.gz
 **2a. Quantifying transcript abundances**
  ```bash
  kallisto quant -i name_of_index_file.idx -o output_directory -b 100 ERR188030_1.fastq.gz ERR188030_2.fastq.gz
+ ## to generate the pseudoaligned bam file use the --genomebam and --gtf options. --gtf option points to a gtf annotation file
+ path/to/kallisto quant -i path/to/name_of_index_file.idx --genomebam --gtf /path/to/gtf/file-o output_directory -b 100 path/to/ERR188030_1.fastq.gz path/to/ERR188030_2.fastq.gz
  ```
 * Runtime with bootstrap = 100 (-b 100) 42m47s
-* Runtime without bootstrap (-b 0 is the default) 2m37s
+* Runtime with bootstrap = 0 2m37s
+* Runtime with bootstrap = 0 and with generation pseudobam file 16m21s
 * Manual notes it is possible to increase the runtime by up to 15% but this has not been explored
 * Note: read files may be in a different directory than the wd. Typing out the full PATH to these items resolves this, but is not optimal.
 * Note: Uncertain if kallisto has the ability to name the output files for this step may interfere with downstream processing - may be adequate to name a unique directory for each output but not optimal  
@@ -218,4 +221,56 @@ fi
 **reading user input**
 ```bash
 read variable_name #Read one line from the standard input, (or from a file) and assign the word(s) to variable name(s).
+```
+
+**Parsing arguments with flags**
+```bash
+#!/bin/sh
+# Keeping options in alphabetical order makes it easy to add more.
+
+while :
+do
+    case "$1" in
+      -f | --file)
+	  file="$2"   # You may want to check validity of $2
+	  shift 2
+	  ;;
+      -h | --help)
+	  display_help  # Call your function
+	  # no shifting needed here, we're done.
+	  exit 0
+	  ;;
+      -u | --user)
+	  username="$2" # You may want to check validity of $2
+	  shift 2
+	  ;;
+      -v | --verbose)
+          #  It's better to assign a string, than a number like "verbose=1"
+	  #  because if you're debugging the script with "bash -x" code like this:
+	  #
+	  #    if [ "$verbose" ] ...
+	  #
+	  #  You will see:
+	  #
+	  #    if [ "verbose" ] ...
+	  #
+          #  Instead of cryptic
+	  #
+	  #    if [ "1" ] ...
+	  #
+	  verbose="verbose"
+	  shift
+	  ;;
+      --) # End of all options
+	  shift
+	  break;
+      -*)
+	  echo "Error: Unknown option: $1" >&2
+	  exit 1
+	  ;;
+      *)  # No more options
+	  break
+	  ;;
+    esac
+done
 ```
