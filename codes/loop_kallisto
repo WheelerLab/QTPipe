@@ -1,26 +1,63 @@
 #!/bin/bash
 
-FastqDir=$1 #needs directory containing the fastq files as input
-BootDefault=100
+BootDefault=0
 SampDefault=10
 
-if [ -n "$2" ]
-then
-	Bootstrap=$2
-else
-	Bootstrap=$BootDefault
-fi
-
-if [ -n "$3" ]
-then
-	SampNum=$3
-else
-	SampNum=$SampDefault
-fi
+while :
+do
+    case "$1" in
+      -b | --bootstrap)#number of desired bootstraps. Default is 0.
+	  Bootstrap="$2"
+	  shift 2
+      -i | --inputdirectory) #directory containing the fastq files to be processed
+	  FastqDir="$2"   # You may want to check validity of $2
+	  shift 2
+	  ;;
+      -s | --samplenumber) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
+	  SampNum="2"
+	  shift 2
+	  ;;
+      --) # End of all options
+	  shift
+	  if [ -z "$FastqDir" ]
+	  then
+	  	echo "Warning: Fastq directory not set"
+		exit 1
+	  else if [ -z "$Bootstrap" ] 
+	  then
+	 	echo "Using default bootstrap of 0"
+		Bootstrap="$BootDefault"
+	  else if [ -z "$SampNum" ] 
+	  then
+	  	echo "using default sample size of 10"
+		SampNum="$SampDefault"
+	  fi
+	  break;
+      -*)
+	  echo "Error: Unknown option: $1" >&2
+	  exit 1
+	  ;;
+      *)  # No more options
+	  if [ -z "$FastqDir" ]
+	  then
+	  	echo "Warning: Fastq directory not set"
+		exit 1
+	  else if [ -z "$Bootstrap" ] 
+	  then
+	 	echo "Using default bootstrap of 0"
+		Bootstrap="$BootDefault"
+	  else if [ -z "$SampNum" ] 
+	  then
+	  	echo "using default sample size of 10"
+		SampNum="$SampDefault"
+	  fi
+	  break
+	  ;;
+    esac
+done
 
 #user input should go around here
-#has an index file been created yet?
-#or we can have the initial input be a flag somehow?
+#can have the initial input be a flag
 
 if [ -e fastq_list.txt ] #remove any file with this name at the start
 then
