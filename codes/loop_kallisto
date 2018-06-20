@@ -32,6 +32,7 @@ done
 if [ -z "$FastqDir" ]
 then
 	echo "Warning: Fastq directory not set"
+	echo "Exiting" 
 	exit 1
 fi
 
@@ -54,9 +55,9 @@ fi
 #user input should go around here
 #can have the initial input be a flag
 
-if [ -e fastq_list.txt ] #remove any file with this name at the start
+if [ -e fastq_list_Kal.txt ] #remove any file with this name at the start
 then
-	rm fastq_list.txt
+	rm fastq_list_Kal.txt
 fi 
 
 for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
