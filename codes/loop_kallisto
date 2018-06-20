@@ -18,7 +18,7 @@ do
 	  SampNum="$2"
 	  shift 2
 	  ;;
-      -*)
+      -*) #unknown 
 	  echo "Error: Unknown option: $1" >&2
 	  exit 1
 	  ;;
@@ -29,28 +29,24 @@ do
      esac
 done
 
-if [ -z "$FastqDir" ]
+if [ -z "$FastqDir" ] #check fastq directory is set otherwise exit 
 then
 	echo "Warning: Fastq directory not set"
 	echo "Exiting" 
 	exit 1
 fi
 
-if [ -z "$Bootstrap" ] 
+if [ -z "$Bootstrap" ] #check that bootstrap is set to input or to default
 then
  	echo "Using default bootstrap of 0"
 	Bootstrap="$BootDefault"
 fi
 
-if [ -z "$SampNum" ] 
+if [ -z "$SampNum" ] #check that sample num is set to input or to default
 then
   	echo "using default sample size of 10"
 	SampNum="$SampDefault"
 fi
-#	  break
-#	  ;;
-#    esac
-#done
 
 #user input should go around here
 #can have the initial input be a flag
@@ -65,13 +61,13 @@ do
 	echo "$file" >> fastq_list.txt #write just the primary tag
 done
 
-#cat fastq_list.txt | while read fastq #now iterate through the list of fastq files
-#if [ -e "$fastq" ]
-#then
-#	rm -r "$fastq" #if a directory with the fastq name already exists rm it to avoid colisions
-#fi
-#do 
-#	/usr/local/bin/anaconda2/bin/kallisto quant -i ~/transcripts.idx -o ./"${fastq}" -b "${Bootstrap}" "${FastqDir}""${fastq}"* #run kallisto quantification on each paired file 
-#	/usr/local/bin/anaconda3/bin/python3 ~/scripts/reads_per_gene_Kallisto.py ~/"${fastq}"/abundanve.tsv ~/"${fastq}"/Gene_abundance.tsv
+cat fastq_list.txt | while read fastq #now iterate through the list of fastq files
+if [ -e "$fastq" ]
+then
+	rm -r "${fastq}_kal" #if a directory with the fastq name already exists rm it to avoid colisions
+fi
+do 
+	/usr/local/bin/anaconda2/bin/kallisto quant -i ~/transcripts.idx -o ./"${fastq}_kal" -b "${Bootstrap}" "${FastqDir}""${fastq}"* #run kallisto quantification on each paired file 
+	/usr/local/bin/anaconda3/bin/python3 ~/scripts/reads_per_gene_Kallisto.py ~/"${fastq}"/abundanve.tsv ~/"${fastq}"/Gene_abundance.tsv
 
-#done
+done
