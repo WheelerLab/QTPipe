@@ -218,8 +218,12 @@ That is it. This will output two files: quant.sf, containing the transcript leve
 ```bash
 ( head -n 1 quant.genes.sf && tail -n +2 quant.genes.sf | sort -k 1) > quant.genes.sorted.sf
 ```
+Approximate runtime on one pre-aligned sample pair (not including time for alignment, or processing the the reference files):  
+2m4s
 
 ## Leafcutter
+
+Leafcutter will be run independent of any quantification software and will be run on STAR alignment files.
 
 ## Samtools
 
@@ -335,6 +339,8 @@ bash commands
 ```bash
 
 PATH=$PATH:/path/to/whatever/directory #temporarily adds to path whatever directory is specified. Lasts as long as the current session
+
+( head -n $x infile && tail -n +$(x+1) infile | sort -k $y ) > out_file #sort a file with a header by column. Skip the first $x lines, and sort by the $yth column (assume start at 1 counting)
 
 /usr/local/bin/anaconda3/bin/python3 #path to python3 on wheeler lab
 
