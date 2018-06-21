@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 FastqDir=$1
 
 if [ -e fastq_list_star.txt ] #remove any files with this name to start with
