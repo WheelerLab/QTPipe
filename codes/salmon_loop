@@ -1,4 +1,7 @@
 #!/bin/bash
+#uncomment next line for automatic path addition
+#PATH=$PATH:~/salmon-0.10.0_linux_x86_64/bin/
+
 set -e
 #should add an option for output directory
 #test runs directoy is a path
