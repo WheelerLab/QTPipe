@@ -144,7 +144,7 @@ nohup bash -c "time STAR --runMode genomeGenerate --genomeDir StarTest --genomeF
   * Should be possible to directly pass STAR the transcript file in place of the genome file and gtf file but this has not been tested
 
 ```bash
-STAR --genomeDir ~/StarTest/ --sjdbGRFfile ~/DATA/GenCode/gencode.v28.annotations.gtf --readFilesIn /home/wheelerlab2/Data/gEUVADIS_RNASeq/ERR188030_1.fa.gz /home/wheelerlab2/Data/gEUVADIS_RNASeq/ERR188030_2.fa.gz --readFilesCommand zcat --quantMode TranscriptomeSAM
+STAR --genomeDir ~/StarTest/ --sjdbGTFfile ~/DATA/GenCode/gencode.v28.annotations.gtf --readFilesIn /home/wheelerlab2/Data/gEUVADIS_RNASeq/ERR188030_1.fa.gz /home/wheelerlab2/Data/gEUVADIS_RNASeq/ERR188030_2.fa.gz --readFilesCommand zcat --quantMode TranscriptomeSAM
 ```
  * Time for this process on one pair of fastq files: 26m7.41s  
  
