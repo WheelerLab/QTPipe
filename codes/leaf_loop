@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+#Bamlocation=$1
+LeafcutterLoc=$1
+out=$2
+PATH=$PATH:"${LeafcutterLoc}"/scripts
+
+if [ -d ~/test_runs/juncfiles ]
+then 
+	rm -r juncfiles
+fi 
+
+mkdir ~/test_runs/juncfiles
+
+cat fastq_list.txt | while read fastq
+do         
+	echo Converting "${fastq}" associated Aligned.out.bam to "${fastq}.starlaligned.junc"
+	sh $LeafcutterLoc/scripts/bam2junc.sh ~/"${fastq}_starrsem"/Aligned.out.bam ./juncfiles/"${fastq}.staraligned.junc"
+	echo "${fastq}.staraligned.junc" >> ~/test_runs/juncfiles/juncfiles.txt
+done
+
+cd ~/test_runs/juncfiles
+
+python "${LeafcutterLoc}"/clustering/leafcutter_cluster.py -j ~/test_runs/juncfiles/juncfiles.txt -m 50 -o "${out}" -l 500000
+python "${LeafcutterLoc}"/scripts/prepare_phenotype_table.py juncfiles/"${out}"_perind.counts.gz -p 10
