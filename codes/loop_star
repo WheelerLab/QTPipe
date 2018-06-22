@@ -15,12 +15,12 @@ done
 #rsem reference file generation will go here
 
 cat fastq_list_star.txt | while read fastq #iterate through the list
-if [ -e "${fastq}_star" ]
+if [ -d ./test_runs/"${fastq}_star" ]
 then
-	rm -r ~/test_runs/"${fastq}_star" #remove any folders that might have this name
+	rm -rf ~/test_runs/"${fastq}_star" #remove any folders that might have this name
 fi
 do
 	mkdir ~/test_runs/"${fastq}_star" #make the directory
 	cd ~/test_runs/"${fastq}_star" #go to that directory
-	STAR --genomeDir ~/StarTest/ --sjdbGTFfile ~/DATA/GenCode/gencode.v28.annotations.gtf --readFilesIn "${FastqDir}""${fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM Unsorted SortedByCoordinate
+	STAR --genomeDir ~/StarTest/ --sjdbGTFfile ~/DATA/GenCode/gencode.v28.annotation.gtf --readFilesIn "${FastqDir}""${fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM Unsorted SortedByCoordinate
 done
