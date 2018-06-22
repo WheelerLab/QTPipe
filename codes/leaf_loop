@@ -15,7 +15,7 @@ mkdir ~/test_runs/juncfiles
 cat fastq_list_star.txt | while read fastq
 do         
 	echo Converting "${fastq}" associated Aligned.out.bam to "${fastq}.starlaligned.junc"
-	sh $LeafcutterLoc/scripts/bam2junc.sh ~/"${fastq}_starrsem"/Aligned.out.bam ./juncfiles/"${fastq}.staraligned.junc"
+	sh $LeafcutterLoc/scripts/bam2junc.sh ~/"${fastq}_star"/Aligned.out.bam ./juncfiles/"${fastq}.staraligned.junc"
 	echo "${fastq}.staraligned.junc" >> ~/test_runs/juncfiles/juncfiles.txt
 done
 
