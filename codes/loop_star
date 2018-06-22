@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 FastqDir=$1
-
+#should add an option for output directory
 if [ -e fastq_list_star.txt ] #remove any files with this name to start with
 then
 	rm fastq_list_star.txt 
@@ -15,7 +15,7 @@ done
 #rsem reference file generation will go here
 
 cat fastq_list_star.txt | while read fastq #iterate through the list
-if [ -d ./test_runs/"${fastq}_star" ]
+if [ -d ./test_runs/"${fastq}_star" ] #temporary fix - should be altered to output path in later runs
 then
 	rm -rf ~/test_runs/"${fastq}_star" #remove any folders that might have this name
 fi
