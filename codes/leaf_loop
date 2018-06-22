@@ -19,7 +19,5 @@ do
 	echo "${fastq}.staraligned.junc" >> ~/test_runs/juncfiles/juncfiles.txt
 done
 
-cd ~/test_runs/juncfiles
-
 python "${LeafcutterLoc}"/clustering/leafcutter_cluster.py -j ~/test_runs/juncfiles/juncfiles.txt -m 50 -o "${out}" -l 500000
-python "${LeafcutterLoc}"/scripts/prepare_phenotype_table.py juncfiles/"${out}"_perind.counts.gz -p 10
+python "${LeafcutterLoc}"/scripts/prepare_phenotype_table.py ~/test_runs/juncfiles/"${out}"_perind.counts.gz -p 10
