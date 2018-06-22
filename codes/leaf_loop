@@ -7,7 +7,7 @@ PATH=$PATH:"${LeafcutterLoc}"/scripts
 
 if [ -d ~/test_runs/juncfiles ]
 then 
-	rm -r juncfiles
+	rm -r ~/test_runs/juncfiles
 fi 
 
 mkdir ~/test_runs/juncfiles
