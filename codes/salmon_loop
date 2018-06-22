@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+FastqDir=$1
+#should add an option for output directory
+
+cat fastq_list_star.txt | while read fastq #iterate through the list
+if [ -d ./test_runs/"${fastq}_star" ] #temporary fix - should be altered to output path in later runs
+then
+	rm -rf ~/test_runs/"${fastq}_star" #remove any folders that might have this name
+fi
+do
+	mkdir ~/test_runs/"${fastq}_star" #make the directory
+	cd ~/test_runs/"${fastq}_star" #go to that directory
+	STAR --genomeDir ~/StarTest/ --sjdbGTFfile ~/DATA/GenCode/gencode.v28.annotation.gtf --readFilesIn "${FastqDir}""${fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM Unsorted SortedByCoordinate
+done
+
+salmon quant -t gencode.v28.transcripts.fa -l A -a Aligned.toTranscriptome.out.bam -o ./salmon_quant --gencode -g gencode.v28.annotation.gtf
+( head -n 1 quant.genes.sf && tail -n +2 quant.genes.sf | sort -k 1) > quant.genes.sorted.sf
