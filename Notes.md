@@ -113,7 +113,7 @@ python3 reads_per_gene_kallisto.py /path/to/abundance.tsv /desired/output/path/o
 ```
 * This bit of code is now automatically called by the loop_kallisto script and is not necessary to invoke
 
-## STAR & RSEM
+## STAR
 version 2.6.0c   
 
 **Running Star** 
@@ -144,9 +144,22 @@ nohup bash -c "time STAR --runMode genomeGenerate --genomeDir StarTest --genomeF
   * Should be possible to directly pass STAR the transcript file in place of the genome file and gtf file but this has not been tested
 
 ```bash
-STAR --genomeDir ~/StarTest/ --sjdbGTFfile ~/DATA/GenCode/gencode.v28.annotations.gtf --readFilesIn /home/wheelerlab2/Data/gEUVADIS_RNASeq/ERR188030_1.fa.gz /home/wheelerlab2/Data/gEUVADIS_RNASeq/ERR188030_2.fa.gz --readFilesCommand zcat --quantMode TranscriptomeSAM
+
+STAR --genomeDir ~/StarTest/ --sjdbGTFfile ~/DATA/GenCode/gencode.v28.annotation.gtf --readFilesIn "${FastqDir}""${fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM Unsorted SortedByCoordinate
+
+#description of options 
+--genomeDir ~/StarTest/ #the directory containing the index file for the reference genome
+--sjdbGTFfile ~/DATA/GenCode/gencode.v28.annotation.gtf #the path to the file with annotated transcripts in the standard GTF format. Optional, but Star notes this as highly recommended
+--readFilesIn "${FastqDir}""${fastq}"* #the fasta read files to be aligned. If multiple read files should be a space separated list
+--readFilesCommand zcat #should be used if your read files are compressed. In this case our fasta files are gzipped so zcat is appropriate to read them.
+--quantMode TranscriptomeSAM GeneCounts #These two arguments give two alignments that may be useful in downstream processing. TranscriptomeSAM gives the Aligned.toTranscriptome.out.bam that may be used by salmon and rsem. GeneCounts gives an the ReadsPerGene.out.tab I don't know what this is for yet. Both arguments may be supplied at once for both files.
+--outSAMtype BAM Unsorted SortedByCoordinate #This argument specifies 3 things. BAM tells STAR we want alignment files to be in .bam format rather than .sam ; SortedByCoordinate generates an alignment that is sorted by transcript coordinate while Unsorted provides an unsorted alignment file.
+
 ```
- * Time for this process on one pair of fastq files: 26m7.41s  
+ * Time for this process on one individual star run is estimated to take between 30m to 1 hour +
+ * Time for this process to run on 10 samples was 494m29s or about 8 hours
+ * Some of these options were only included for testing and may have slowed the process down moderately. I estimate its possible to shave off about an hour at minimum with the current sample size
+ ## RSEM  
  
  **3. Prepare the RSEM reference files**
  
