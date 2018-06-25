@@ -236,7 +236,41 @@ Approximate runtime on one pre-aligned sample pair (not including time for align
 
 ## Leafcutter
 
-Leafcutter will be run independent of any quantification software and will be run on STAR alignment files.
+[Please refer to the full documentation for further questions](http://davidaknowles.github.io/leafcutter/articles/sQTL.html)
+Leafcutter will be run independent of any quantification software and will be run on STAR alignment files.   
+
+**1. Generate the junction files**    
+an individual junction file can be generated as such    
+```bash
+sh $LeafcutterLoc/scripts/bam2junc.sh ~/test_runs/"${fastq}_star"/Aligned.out.bam ~/test_runs/juncfiles/"${fastq}.staraligned.junc"
+ #this will take the alignment file taken by an individual star run and convert it to the junction file
+```
+Looping it on multiple alignments is similarly simple
+```bash
+cat fastq_list_star.txt | while read fastq #will make sure that the star outputs are the same as the leafcutter inputs
+do         
+	echo Converting "${fastq}" associated Aligned.out.bam to "${fastq}.starlaligned.junc"
+	sh $LeafcutterLoc/scripts/bam2junc.sh ~/test_runs/"${fastq}_star"/Aligned.out.bam ~/test_runs/juncfiles/"${fastq}.staraligned.junc"
+	echo "${fastq}.staraligned.junc" >> ~/test_runs/juncfiles/juncfiles.txt
+done
+```
+Note that this method relies on the .txt file generated in a previous step - keep track of where this file is located    
+
+**2.Mapping of intron clusters** 
+
+```bash
+python "${LeafcutterLoc}"/clustering/leafcutter_cluster.py -j ~/test_runs/juncfiles/juncfiles.txt -m 50 -o "${out}" -l 500000
+```
+
+**3a. Filtering unmapped loci**
+```bash
+zcat "${out}_perind.counts.gz" | grep "chr" > "${out}"_filtered_perind.counts.gz #filtering step - removes unmapped loci that woukld break leafcutter
+```
+**3b. Calculate the intron excision ratios**
+```bash
+python "${LeafcutterLoc}"/scripts/prepare_phenotype_table.py ~/test_runs/juncfiles/"${out}"_filtered_perind.counts.gz -p 10
+```
+* Approximate runtime on 10 samples 56m32s (?)
 
 ## Samtools
 
