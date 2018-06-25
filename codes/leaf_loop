@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 #Bamlocation=$1
-LeafcutterLoc=$1
-out=$2
+LeafcutterLoc=$1 #required option
+out=$2 #update as option - the prefix you wish the counts.gz files to have
 PATH=$PATH:"${LeafcutterLoc}"/scripts
 
 if [ -d ~/test_runs/juncfiles ]
@@ -10,14 +10,18 @@ then
 	rm -r ~/test_runs/juncfiles
 fi 
 
-mkdir ~/test_runs/juncfiles
+mkdir ~/test_runs/juncfiles # make a directory where the outputs will go - also update as an option
 
-cat fastq_list_star.txt | while read fastq
+cat fastq_list_star.txt | while read fastq #will make sure that the star outputs are the same as the leafcutter inputs
 do         
 	echo Converting "${fastq}" associated Aligned.out.bam to "${fastq}.starlaligned.junc"
 	sh $LeafcutterLoc/scripts/bam2junc.sh ~/test_runs/"${fastq}_star"/Aligned.out.bam ~/test_runs/juncfiles/"${fastq}.staraligned.junc"
 	echo "${fastq}.staraligned.junc" >> ~/test_runs/juncfiles/juncfiles.txt
 done
 
+
 python "${LeafcutterLoc}"/clustering/leafcutter_cluster.py -j ~/test_runs/juncfiles/juncfiles.txt -m 50 -o "${out}" -l 500000
-python "${LeafcutterLoc}"/scripts/prepare_phenotype_table.py ~/test_runs/juncfiles/"${out}"_perind.counts.gz -p 10
+zcat "${out}_perind.counts.gz" | grep "chr" > "${out}"_filtered_perind.counts.gz #filtering step - removes unmapped loci that woukld break leafcutter
+# add renameing step here
+#may be optional in future iterations
+python "${LeafcutterLoc}"/scripts/prepare_phenotype_table.py ~/test_runs/juncfiles/"${out}"_filtered_perind.counts.gz -p 10
