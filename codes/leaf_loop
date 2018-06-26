@@ -24,4 +24,6 @@ python "${LeafcutterLoc}"/clustering/leafcutter_cluster.py -j ~/test_runs/juncfi
 zcat "${out}_perind.counts.gz" | grep "chr" > "${out}"_filtered_perind.counts.gz #filtering step - removes unmapped loci that woukld break leafcutter
 # add renameing step here
 #may be optional in future iterations
-python "${LeafcutterLoc}"/scripts/prepare_phenotype_table.py ~/test_runs/juncfiles/"${out}"_filtered_perind.counts.gz -p 10
+/usr/local/bin/anaconda3/bin/python3 ~/scripts/counts_rename.py ~/test_runs/juncfiles/"${out}"_filtered_perind.counts.gz ~/E-GEUV-1.sdrf.txt ~/test_runs/juncfiles/
+#note this line requires full path
+/usr/local/bin/anaconda2/bin/python "${LeafcutterLoc}"/scripts/prepare_phenotype_table.py ~/test_runs/juncfiles/renamed_filt_perind.counts.gz -p 10
