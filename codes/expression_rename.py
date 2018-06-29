@@ -20,7 +20,7 @@ files = glob.glob(args.expression_dir + "expression_sal_chr*")
 for file in files:
   with open(file, 'rt', encoding='utf-8') as target:
 	  header = target.readline().strip('\n').split()
-    new_header = ['gene_id']
+	  new_header = ['gene_id']
 	  for colname in header:
 		  if colname in names_dict:
 			  new_header.append(names_dict[colname])
