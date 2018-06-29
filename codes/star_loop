@@ -1,26 +1,95 @@
 #!/bin/bash
 set -e
-FastqDir=$1
-#should add an option for output directory
+
+AlignmentOutDefault=~/StarAlignments/ #
+ReadFilesInDefault=zcat
+RunIndexDefault=False
+RunIndexOutDefault=~/starIndex/
+SampNumDefualt=10 #
+
+#option for are your files compressed - for us make defualt yes with zcat
+
+#option for indexing has been run and it is in this directory
+#option for run star indexing with given directory - by defualt does not run 
+#option for output for star indexing with defualt of ~/starIndex
+
+while :
+do
+    case "$1" in
+      -a | --annotation) #annotation file corresponding to the genome
+          AnnotationFile="$2"
+	  shift 2
+	  ;;
+      -i | --inputdirectory) #directory containing the fastq files to be processed
+	  FastqDir="$2"  
+	  shift 2
+	  ;;
+      -o | --outputdirectory) #directory where you'd like to send all your alignments
+          AlignmentOut="$2"
+	  shift 2
+	  ;;
+      -s | --samplenumber) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
+	  SampNum="$2"
+	  shift 2
+	  ;;
+      -*) #unknown 
+	  echo "Error: Unknown option: $1" >&2
+	  exit 1
+	  ;;
+      *)  # No more options
+	  shift
+	  break
+	  ;;
+     esac
+done
+
+
+if [ -z "$FastqDir" ] #check fastq directory is set otherwise exit 
+then
+	echo "Warning: Fastq directory not set"
+	echo "Exiting" 
+	exit 1
+fi
+
+if [ -z "$AnnotationFile" ] #check that an annotation file has been provided
+then
+	echo "Warning: Annotation file not provided"
+	echo "Exiting"
+	exit 1
+fi
+
+if [ -z "$AlignmentOut" ]
+then
+	AlignmentOut="${AlignmentOutDefault}"
+	mkdir "${AlignmentOutDefault}"
+fi
+echo "sending output to ${AlignmentOut} (default is ${AlignmentOutDefault})"
+
+if [ -z "$SampNum" ] #check that sample num is set to input or to default
+then
+	SampNum="$SampNumDefault"
+fi
+echo "using sample size of ${SampNum} (default is ${SampNum})"
+
 if [ -e fastq_list_star.txt ] #remove any files with this name to start with
 then
 	rm fastq_list_star.txt 
 fi 
-for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n 10` #generate fastq list from scratch
+for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
 do
 	echo $file >> fastq_list_star.txt
 done
 
 #STAR indexing will go here
-#rsem reference file generation will go here
+#STAR --runMode genomeGenerate --genomeDir StarTest --genomeFastaFiles ~/DATA/Gencode/GRCh38.primary_assembly.fa
 
 cat fastq_list_star.txt | while read fastq #iterate through the list
 if [ -d ./test_runs/"${fastq}_star" ] #temporary fix - should be altered to output path in later runs
 then
-	rm -rf ~/test_runs/"${fastq}_star" #remove any folders that might have this name
+	rm -rf "${AlignmentOut}""${fastq}_star" #remove any folders that might have this name
 fi
 do
-	mkdir ~/test_runs/"${fastq}_star" #make the directory
-	cd ~/test_runs/"${fastq}_star" #go to that directory
-	STAR --genomeDir ~/StarTest/ --sjdbGTFfile ~/DATA/GenCode/gencode.v28.annotation.gtf --readFilesIn "${FastqDir}""${fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM Unsorted SortedByCoordinate
+	mkdir "${AlignmentOut}""${fastq}_star" #make the directory
+	cd "${AlignmentOut}""${fastq}_star" #go to that directory
+	STAR --genomeDir ~/StarTest/ --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM Unsorted SortedByCoordinate
 done
