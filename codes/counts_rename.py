@@ -8,6 +8,7 @@ parser.add_argument('associated_names', help = 'the file E-GEUV-1.sdrf.txt conta
 parser.add_argument('outfile', help = 'file path of the renamed headers file')
 args = parser.parse_args()
 
+#would be better to generate this names dictionary once and reuse it for all files in a loop
 names_dict = {}
 with open(args.associated_names, 'r', encoding = 'utf-8') as names:
 	next(names)
