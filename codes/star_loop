@@ -129,16 +129,20 @@ then
 fi 
 for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
 do
-	echo $file >> fastq_list_star.txt
+	grep $file ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> fastq_list_star.txt #this hardcoded path may be problematic in the future
 done
 
-cat fastq_list_star.txt | while read fastq #iterate through the list
-if [ -d "${AlignmentOut}""${fastq}_star" ] #temporary fix - should be altered to output path in later runs
-then
-	rm -rf "${AlignmentOut}""${fastq}_star" #remove any folders that might have this name
-fi
+#filtering step in R goes here
+
+cat fastq_list_star.txt | while read line #iterate through the list
 do
-	mkdir "${AlignmentOut}""${fastq}_star" #make the directory
-	cd "${AlignmentOut}""${fastq}_star" #go to that directory
-	STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted SortedByCoordinate
+	Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
+	Sample=$( echo "${line}" | cut -f 2 -d$'\t' )
+	if [ -d "${AlignmentOut}""${Sample}_star" ] 
+	then
+		rm -rf "${AlignmentOut}""${Sample}_star" #remove any folders that might have this name
+	fi
+	mkdir "${AlignmentOut}""${Sample}_star" #make the directory
+	cd "${AlignmentOut}""${Sample}_star" #go to that directory
+	STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${Fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted SortedByCoordinate
 done
