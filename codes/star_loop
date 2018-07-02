@@ -3,15 +3,12 @@ set -e
 
 AlignmentOutDefault=~/StarAlignments/ #
 ReadFilesInDefault=zcat
-RunIndexDefault=False
-RunIndexOutDefault=~/starIndex/
+RunIndexDefault=False #
+IndexDirectoryDefault=~/starIndex/ #
 SampNumDefualt=10 #
 
 #option for are your files compressed - for us make defualt yes with zcat
-
-#option for indexing has been run and it is in this directory
-#option for run star indexing with given directory - by defualt does not run 
-#option for output for star indexing with defualt of ~/starIndex
+#option for genome fasta files for indexing - could provide a default for our purposes
 
 while :
 do
@@ -20,13 +17,25 @@ do
           AnnotationFile="$2"
 	  shift 2
 	  ;;
+      -g | --genomefastafiles) #file path to the genome files for indexing. Must be supplied when -ri is supplied
+          GenomeFiles="$2"
+	  shift 2
+	  ;;
       -i | --inputdirectory) #directory containing the fastq files to be processed
 	  FastqDir="$2"  
+	  shift 2
+	  ;;
+      -id | --indexingdirectory) #when supplied alone, indexing has been run, and points to the index directory. When supplied with -ri, serves as output directory for indexing.
+	  IndexDirectory="$2"
 	  shift 2
 	  ;;
       -o | --outputdirectory) #directory where you'd like to send all your alignments
           AlignmentOut="$2"
 	  shift 2
+	  ;;
+      -ri | --runindexing) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
+	  RunIndex=True
+	  shift 1
 	  ;;
       -s | --samplenumber) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
 	  SampNum="$2"
@@ -71,6 +80,42 @@ then
 fi
 echo "using sample size of ${SampNum} (default is ${SampNum})"
 
+if [ -z "$IndexDirectory" ]
+then
+	IndexDirectory="${IndexDirectoryDefault}"
+fi
+
+if [ -z "$RunIndex" && ! -d "$IndexDirectory" ] #If it does not exist 
+then
+	echo "Warning: Indexing files not supplied and indexing not being run"
+	echo "Please provide either indexing files or run indexing"
+	echo "Exiting"
+	exit 1
+elif [ -z "$RunIndex" && -d "$IndexDirectory" ] #If not running indexing, check that index directory exists
+then
+	RunIndex="${RunIndexDefaut}"
+	echo "Not running indexing. Using index files located within ${IndexDirectory} "
+fi
+
+if [ "$RunIndex"=True && -z "$GenomeFiles" ] 
+then
+	echo "Warning: Indexing being run without genome files"
+	echo "Please supply genome files with -g argument"
+	echo "Exiting"
+	exit 1
+elif [ "$RunIndex"=True && -n "$GenomeFiles" &&  ! -d "$IndexDirectory" ]
+then
+	mkdir "${IndexDirectory}"
+elif [ "$RunIndex"=True && -n "$GenomeFiles" &&  -d "$IndexDirectory" ]
+then
+	echo "Warning: ${IndexDirectory} exists and may contain files. Do you wish to overwrite this directory and its contents? No will exit"
+	select yn in "Yes" "No"; do
+		case $yn in
+			Yes ) rm -r -f ${IndexDirectory}; mkdir ${IndexDirectory}; break;;
+			No ) echo "exiting"; exit 1;;
+		esac
+	done
+fi
 if [ -e fastq_list_star.txt ] #remove any files with this name to start with
 then
 	rm fastq_list_star.txt 
