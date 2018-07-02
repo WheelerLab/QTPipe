@@ -2,9 +2,9 @@
 set -e
 
 AlignmentOutDefault=~/StarAlignments/ #
+IndexDirectoryDefault=~/starIndex/ #
 ReadFilesInDefault=zcat
 RunIndexDefault=False #
-IndexDirectoryDefault=~/starIndex/ #
 SampNumDefualt=10 #
 
 #option for are your files compressed - for us make defualt yes with zcat
@@ -116,6 +116,13 @@ then
 		esac
 	done
 fi
+
+#STAR indexing will go here
+if [ "${RunIndex}"=True ]
+then
+	STAR --runMode genomeGenerate --genomeDir "${IndexDirectory}" --genomeFastaFiles "${GenomeFiles}"
+fi
+
 if [ -e fastq_list_star.txt ] #remove any files with this name to start with
 then
 	rm fastq_list_star.txt 
@@ -125,16 +132,13 @@ do
 	echo $file >> fastq_list_star.txt
 done
 
-#STAR indexing will go here
-#STAR --runMode genomeGenerate --genomeDir StarTest --genomeFastaFiles ~/DATA/Gencode/GRCh38.primary_assembly.fa
-
 cat fastq_list_star.txt | while read fastq #iterate through the list
-if [ -d ./test_runs/"${fastq}_star" ] #temporary fix - should be altered to output path in later runs
+if [ -d "${AlignmentOut}""${fastq}_star" ] #temporary fix - should be altered to output path in later runs
 then
 	rm -rf "${AlignmentOut}""${fastq}_star" #remove any folders that might have this name
 fi
 do
 	mkdir "${AlignmentOut}""${fastq}_star" #make the directory
 	cd "${AlignmentOut}""${fastq}_star" #go to that directory
-	STAR --genomeDir ~/StarTest/ --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM Unsorted SortedByCoordinate
+	STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted SortedByCoordinate
 done
