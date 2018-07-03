@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 AlignmentOutDefault=~/StarAlignments/ #
 IndexDirectoryDefault=~/starIndex/ #
@@ -76,37 +75,38 @@ echo "sending output to ${AlignmentOut} (default is ${AlignmentOutDefault})"
 
 if [ -z "$SampNum" ] #check that sample num is set to input or to default
 then
-	SampNum="$SampNumDefault"
+	SampNum="${SampNumDefualt}"
 fi
-echo "using sample size of ${SampNum} (default is ${SampNum})"
+echo "using sample size of ${SampNum} (default is ${SampNumDefualt})"
 
 if [ -z "$IndexDirectory" ]
 then
 	IndexDirectory="${IndexDirectoryDefault}"
 fi
+echo "using indexing output of ${IndexDirectory} (default is ${IndexDirectoryDefault})"
 
-if [ -z "$RunIndex" && ! -d "$IndexDirectory" ] #If it does not exist 
+if [ -z "${RunIndex}" ] && [ ! -d "${IndexDirectory}" ] #If it does not exist 
 then
 	echo "Warning: Indexing files not supplied and indexing not being run"
 	echo "Please provide either indexing files or run indexing"
 	echo "Exiting"
 	exit 1
-elif [ -z "$RunIndex" && -d "$IndexDirectory" ] #If not running indexing, check that index directory exists
+elif [ -z "$RunIndex" ] && [ -d "$IndexDirectory" ] #If not running indexing, check that index directory exists
 then
-	RunIndex="${RunIndexDefaut}"
+	RunIndex="${RunIndexDefault}"
 	echo "Not running indexing. Using index files located within ${IndexDirectory} "
 fi
 
-if [ "$RunIndex"=True && -z "$GenomeFiles" ] #if running indexing but no genome files have been provided throw an error
+if [ "$RunIndex" = True ] && [ -z "$GenomeFiles" ] #if running indexing but no genome files have been provided throw an error
 then
 	echo "Warning: Indexing being run without genome files"
 	echo "Please supply genome files with -g argument"
 	echo "Exiting"
 	exit 1
-elif [ "$RunIndex"=True && -n "$GenomeFiles" &&  ! -d "$IndexDirectory" ] #if running indexing into a new directory everything is good
+elif [ "$RunIndex" = True ] && [ -n "$GenomeFiles" ] && [ ! -d "$IndexDirectory" ] #if running indexing into a new directory everything is good
 then
 	mkdir "${IndexDirectory}"
-elif [ "$RunIndex"=True && -n "$GenomeFiles" &&  -d "$IndexDirectory" ] #if running indexing into an old already existing directory then check that this is right - don't want to run indexing again if unecessary
+elif [ "$RunIndex" = True ] && [ -n "$GenomeFiles" ] && [ -d "$IndexDirectory" ] #if running indexing into an old already existing directory then check that this is right - don't want to run indexing again if unecessary
 then
 	echo "Warning: ${IndexDirectory} exists and may contain files. Do you wish to overwrite this directory and its contents? No will exit"
 	select yn in "Yes" "No"; do
