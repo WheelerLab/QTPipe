@@ -135,7 +135,7 @@ STAR --runMode genomeGenerate --genomeDir StarTest --genomeFastaFiles Data/Genco
 ```bash
 nohup bash -c "time STAR --runMode genomeGenerate --genomeDir StarTest --genomeFastaFiles Data/Gencode/GRCh38.primary_assembly.fa"
 ```
-* Approximate time 112m
+* Approximate time 3hs
 
 **2.Map the gzipped FASTQ files outputting unsorted and coordinate-sorted BAMs**  
 \* This process was taken from Alternate Protocol 7 of Dobin & Gingeras (2016)  
