@@ -13,6 +13,8 @@ This outline is intended to be a living document, with examples and descriptions
 
 The star_loop script is intended to loop STAR alignment steps to both genomic and transcriptomic contexts. The basic required files are an uncompressed annotation file (.gtf), an uncompressed genome file (.fa), and any number of paired end compressed read files (.fa.gz). Because this script is an implementation of STAR, many of the options included are based on the standard STAR options with reasonable defaults provided for this lab.
 
+The star loop now has a built in method to rename samples so that they match with SNP sample names. Currently this is hardcoded in for in lab usage. More flexible applications need to be explored still. Similarly the script now filters the input samples to ensure they are within the genotyped pool.
+
 **Options**  
 -a or --annotation
 >This option specifies the full path to the annotation file. This is a **_required_** option with no defaults currently. In future implementations it is reasonable to expect that the annotation file may not differ between between runs of this pipeline. As such it is reasonable to expect that a default will be provided for in lab usage.    
