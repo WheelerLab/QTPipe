@@ -137,8 +137,8 @@ Rscript ~/scripts/sample_filtering.R ~/fastq_list_star.txt ~/DATA/GEU_SNPs.txt
 
 cat fastq_list_star.txt | while read line #iterate through the list
 do
-	Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
-	Sample=$( echo "${line}" | cut -f 2 -d$'\t' )
+	Fastq=$( echo "${line}" | cut -f 2 -d$'\t' )
+	Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
 	if [ -d "${AlignmentOut}""${Sample}_star" ] 
 	then
 		rm -rf "${AlignmentOut}""${Sample}_star" #remove any folders that might have this name
