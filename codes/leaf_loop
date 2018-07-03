@@ -20,7 +20,6 @@ OutputPrefixPrefixDefault=leafcutter
 while :
 do
     case "$1" in
-
       -l | --lengthmaximum) #maximum length of introns to be used in clustering
       	  LengthMaximum="$2"
 	  shift 2
@@ -52,7 +51,7 @@ do
      esac
 done
 
-
+#checks need to go here
 
 PATH=$PATH:"${LeafcutterLoc}"/scripts
 
