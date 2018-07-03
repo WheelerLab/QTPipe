@@ -5,7 +5,7 @@ IndexDirectoryDefault=~/starIndex/ #
 ReadFilesInDefault=zcat
 RunIndexDefault=False #
 SampNumDefualt=10 #
-
+ThreadsDefault=6
 #option for are your files compressed - for us make defualt yes with zcat
 #option for genome fasta files for indexing - could provide a default for our purposes
 
@@ -40,6 +40,10 @@ do
 	  SampNum="$2"
 	  shift 2
 	  ;;
+      -t | --threads) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
+	  Threads="$2"
+	  shift 2
+	  ;;
       -*) #unknown 
 	  echo "Error: Unknown option: $1" >&2
 	  exit 1
@@ -72,6 +76,11 @@ then
 	mkdir "${AlignmentOutDefault}"
 fi
 echo "sending output to ${AlignmentOut} (default is ${AlignmentOutDefault})"
+
+if [ -z "$Threads" ]
+then 
+	Threads="${ThreadsDefault}"
+fi
 
 if [ -z "$SampNum" ] #check that sample num is set to input or to default
 then
@@ -120,7 +129,7 @@ fi
 #STAR indexing will go here
 if [ "${RunIndex}"=True ]
 then
-	STAR --runMode genomeGenerate --genomeDir "${IndexDirectory}" --genomeFastaFiles "${GenomeFiles}"
+	STAR --runMode genomeGenerate --genomeDir "${IndexDirectory}" --genomeFastaFiles "${GenomeFiles}" --runThreadN "${Threads}"
 fi
 
 if [ -e fastq_list_star.txt ] #remove any files with this name to start with
@@ -145,5 +154,5 @@ do
 	fi
 	mkdir "${AlignmentOut}""${Sample}_star" #make the directory
 	cd "${AlignmentOut}""${Sample}_star" #go to that directory
-	STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${Fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted SortedByCoordinate
+	STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${Fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted SortedByCoordinate --runThreadN "${Threads}"
 done
