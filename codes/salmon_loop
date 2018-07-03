@@ -2,6 +2,26 @@
 #uncomment next line for automatic path addition
 #PATH=$PATH:~/salmon-0.10.0_linux_x86_64/bin/
 
+while :
+do
+    case "$1" in
+     
+      -o | --outputprefix) #write leafcutter clustering to this directory
+      	  OutputDirectory="$2"
+	  shift 2
+      	  ;;
+      -*) #unknown 
+	  echo "Error: Unknown option: $1" >&2
+	  exit 1
+	  ;;
+      *)  # No more options
+	  shift
+	  break
+	  ;;
+     esac
+done
+
+
 set -e
 #should add an option for output directory
 #test runs directoy is a path
