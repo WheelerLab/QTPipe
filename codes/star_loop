@@ -97,16 +97,16 @@ then
 	echo "Not running indexing. Using index files located within ${IndexDirectory} "
 fi
 
-if [ "$RunIndex"=True && -z "$GenomeFiles" ] 
+if [ "$RunIndex"=True && -z "$GenomeFiles" ] #if running indexing but no genome files have been provided throw an error
 then
 	echo "Warning: Indexing being run without genome files"
 	echo "Please supply genome files with -g argument"
 	echo "Exiting"
 	exit 1
-elif [ "$RunIndex"=True && -n "$GenomeFiles" &&  ! -d "$IndexDirectory" ]
+elif [ "$RunIndex"=True && -n "$GenomeFiles" &&  ! -d "$IndexDirectory" ] #if running indexing into a new directory everything is good
 then
 	mkdir "${IndexDirectory}"
-elif [ "$RunIndex"=True && -n "$GenomeFiles" &&  -d "$IndexDirectory" ]
+elif [ "$RunIndex"=True && -n "$GenomeFiles" &&  -d "$IndexDirectory" ] #if running indexing into an old already existing directory then check that this is right - don't want to run indexing again if unecessary
 then
 	echo "Warning: ${IndexDirectory} exists and may contain files. Do you wish to overwrite this directory and its contents? No will exit"
 	select yn in "Yes" "No"; do
@@ -129,10 +129,11 @@ then
 fi 
 for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
 do
-	grep $file ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> fastq_list_star.txt #this hardcoded path may be problematic in the future
+	grep -m 1 $file ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> fastq_list_star.txt #this hardcoded path may be problematic in the future
 done
 
 #filtering step in R goes here
+Rscript ~/scripts/sample_filtering.R ~/fastq_list_star.txt ~/DATA/GEU_SNPs.txt
 
 cat fastq_list_star.txt | while read line #iterate through the list
 do
