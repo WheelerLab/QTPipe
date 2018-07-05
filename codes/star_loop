@@ -154,5 +154,5 @@ do
 	fi
 	mkdir "${AlignmentOut}""${Sample}_star" #make the directory
 	cd "${AlignmentOut}""${Sample}_star" #go to that directory
-	STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${Fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted SortedByCoordinate --runThreadN "${Threads}"
+	STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${Fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}"
 done
