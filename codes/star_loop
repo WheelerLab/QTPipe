@@ -55,45 +55,18 @@ do
      esac
 done
 
-
-if [ -z "$FastqDir" ] #check fastq directory is set otherwise exit 
-then
-	echo "Warning: Fastq directory not set"
-	echo "Exiting" 
-	exit 1
-fi
-
-if [ -z "$AnnotationFile" ] #check that an annotation file has been provided
-then
-	echo "Warning: Annotation file not provided"
-	echo "Exiting"
-	exit 1
-fi
+echo "Fastq directory is ${FastqDir:?unset}"
+echo "Annotation file is ${AnnotationFile:?unset}"
+echo" Using ${Threads:=ThreadsDefault} cores"
+echo "using sample size of ${SampNum:=SampNumDefault}"
+echo "using indexing output of ${IndexDirectory:=IndexDirectoryDefault}"
+echo "sending output to ${AlignmentOut:=AlignmentOutDefault}"
 
 if [ -z "$AlignmentOut" ]
 then
 	AlignmentOut="${AlignmentOutDefault}"
 	mkdir "${AlignmentOutDefault}"
 fi
-echo "sending output to ${AlignmentOut} (default is ${AlignmentOutDefault})"
-
-if [ -z "$Threads" ]
-then 
-	Threads="${ThreadsDefault}"
-fi
-
-if [ -z "$SampNum" ] #check that sample num is set to input or to default
-then
-	SampNum="${SampNumDefualt}"
-fi
-echo "using sample size of ${SampNum} (default is ${SampNumDefualt})"
-
-if [ -z "$IndexDirectory" ]
-then
-	IndexDirectory="${IndexDirectoryDefault}"
-fi
-echo "using indexing output of ${IndexDirectory} (default is ${IndexDirectoryDefault})"
-
 if [ -z "${RunIndex}" ] && [ ! -d "${IndexDirectory}" ] #If it does not exist 
 then
 	echo "Warning: Indexing files not supplied and indexing not being run"
