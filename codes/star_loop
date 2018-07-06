@@ -64,7 +64,9 @@ echo "using sample size of ${SampNum:=SampNumDefault}"
 echo "using indexing output of ${IndexDirectory:=IndexDirectoryDefault}"
 echo "sending output to ${AlignmentOut:=AlignmentOutDefault}"
 
-#run index or nor
+
+
+#run index or not
 case "${RunIndex}" in 
 	False)
 		if [ ! -d "${IndexDirectory}" ] #check: if not running indexing, then index must exist
@@ -89,7 +91,7 @@ case "${RunIndex}" in
 		fi
 		STAR --runMode genomeGenerate --genomeDir "${IndexDirectory}" --genomeFastaFiles "${GenomeFiles}" --runThreadN "${Threads}"
 		;;
-	esac
+esac
 
 
 #now create list of samples and their corresponding names
@@ -105,6 +107,7 @@ Rscript ~/scripts/sample_filtering.R ~/fastq_list_star.txt ~/DATA/GEU_SNPs.txt
 
 
 
+#now perform the actual alignment
 if [ ! -d "${AlignmentOut}" ]
 then
 	mkdir "${AlignmentOut}"
