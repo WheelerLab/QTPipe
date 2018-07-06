@@ -55,68 +55,60 @@ do
      esac
 done
 
-echo "Fastq directory is ${FastqDir:?unset}"
-echo "Annotation file is ${AnnotationFile:?unset}"
+
+#check: That all variables are set or default
+echo "Fastq directory is ${FastqDir:?not set}"
+echo "Annotation file is ${AnnotationFile:?not set}"
 echo "Using ${Threads:=ThreadsDefault} cores"
 echo "using sample size of ${SampNum:=SampNumDefault}"
 echo "using indexing output of ${IndexDirectory:=IndexDirectoryDefault}"
 echo "sending output to ${AlignmentOut:=AlignmentOutDefault}"
 
-if [ -z "$AlignmentOut" ]
-then
-	AlignmentOut="${AlignmentOutDefault}"
-	mkdir "${AlignmentOutDefault}"
-fi
-if [ -z "${RunIndex}" ] && [ ! -d "${IndexDirectory}" ] #If it does not exist 
-then
-	echo "Warning: Indexing files not supplied and indexing not being run"
-	echo "Please provide either indexing files or run indexing"
-	echo "Exiting"
-	exit 1
-elif [ -z "$RunIndex" ] && [ -d "$IndexDirectory" ] #If not running indexing, check that index directory exists
-then
-	RunIndex="${RunIndexDefault}"
-	echo "Not running indexing. Using index files located within ${IndexDirectory} "
-fi
+#run index or nor
+case "${RunIndex}" in 
+	False)
+		if [ ! -d "${IndexDirectory}" ] #check: if not running indexing, then index must exist
+		then
+			echo "Warning: Indexing files not supplied and indexing not being run"
+			echo "Please provide either indexing files or run indexing"
+			echo "Exiting"
+			exit 1
+		fi
+		;;
+	True)
+		if [ -z "${GenomeFiles}" ] #check: if running indexing, genome files must be provided
+		then
+			echo "Warning: Indexing being run without genome files"
+			echo "Please supply genome files with -g argument"
+			echo "Exiting"
+			exit 1
+		fi
+		if [ ! -d "${IndexDirectory}" ]  #should seriously consider a warning for if this directory already exists
+		then
+			mkdir "${IndexDirectory}"
+		fi
+		STAR --runMode genomeGenerate --genomeDir "${IndexDirectory}" --genomeFastaFiles "${GenomeFiles}" --runThreadN "${Threads}"
+		;;
+	esac
 
-if [ "$RunIndex" = True ] && [ -z "$GenomeFiles" ] #if running indexing but no genome files have been provided throw an error
-then
-	echo "Warning: Indexing being run without genome files"
-	echo "Please supply genome files with -g argument"
-	echo "Exiting"
-	exit 1
-elif [ "$RunIndex" = True ] && [ -n "$GenomeFiles" ] && [ ! -d "$IndexDirectory" ] #if running indexing into a new directory everything is good
-then
-	mkdir "${IndexDirectory}"
-elif [ "$RunIndex" = True ] && [ -n "$GenomeFiles" ] && [ -d "$IndexDirectory" ] #if running indexing into an old already existing directory then check that this is right - don't want to run indexing again if unecessary
-then
-	echo "Warning: ${IndexDirectory} exists and may contain files. Do you wish to overwrite this directory and its contents? No will exit"
-	select yn in "Yes" "No"; do
-		case $yn in
-			Yes ) rm -r -f ${IndexDirectory}; mkdir ${IndexDirectory}; break;;
-			No ) echo "exiting"; exit 1;;
-		esac
-	done
-fi
 
-#STAR indexing will go here
-if [ "${RunIndex}"=True ]
-then
-	STAR --runMode genomeGenerate --genomeDir "${IndexDirectory}" --genomeFastaFiles "${GenomeFiles}" --runThreadN "${Threads}"
-fi
-
+#now create list of samples and their corresponding names
 if [ -e fastq_list_star.txt ] #remove any files with this name to start with
 then
 	rm fastq_list_star.txt 
 fi 
 for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
 do
-	grep -m 1 $file ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> fastq_list_star.txt #this hardcoded path may be problematic in the future
+	grep -m 1 "${file}" ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> fastq_list_star.txt #this hardcoded path may be problematic in the future
 done
-
-#filtering step in R goes here
 Rscript ~/scripts/sample_filtering.R ~/fastq_list_star.txt ~/DATA/GEU_SNPs.txt
 
+
+
+if [ ! -d "${AlignmentOut}" ]
+then
+	mkdir "${AlignmentOut}"
+fi
 cat fastq_list_star.txt | while read line #iterate through the list
 do
 	Fastq=$( echo "${line}" | cut -f 2 -d$'\t' )
