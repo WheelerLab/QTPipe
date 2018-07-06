@@ -57,7 +57,7 @@ done
 
 echo "Fastq directory is ${FastqDir:?unset}"
 echo "Annotation file is ${AnnotationFile:?unset}"
-echo" Using ${Threads:=ThreadsDefault} cores"
+echo "Using ${Threads:=ThreadsDefault} cores"
 echo "using sample size of ${SampNum:=SampNumDefault}"
 echo "using indexing output of ${IndexDirectory:=IndexDirectoryDefault}"
 echo "sending output to ${AlignmentOut:=AlignmentOutDefault}"
