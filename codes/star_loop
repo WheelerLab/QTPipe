@@ -96,15 +96,15 @@ esac
 
 
 #now create list of samples and their corresponding names
-if [ -e fastq_list_star.txt ] #remove any files with this name to start with
+if [ -e ~/fastq_list_star.txt ] #remove any files with this name to start with
 then
-	rm fastq_list_star.txt 
+	rm ~/fastq_list_star.txt 
 fi 
 for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
 do
-	grep -m 1 "${file}" ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> fastq_list_star.txt #this hardcoded path may be problematic in the future
+	grep -m 1 "${file}" ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> ~/fastq_list_star.txt #this hardcoded path may be problematic in the future
 done
-Rscript ~/scripts/sample_filtering.R ~/fastq_list_star.txt ~/DATA/GEU_SNPs.txt
+Rscript ~/scripts/sample_filtering.R ~/fastq_list_star.txt ~/Data/GEU_SNPs.txt
 
 
 
