@@ -40,6 +40,31 @@ The star loop now has a built in method to rename samples so that they match wit
 **features not yet implemented**
 argument to run on an entire directory  
 option for different types of star output (SAM vs BAM vs sorted vs unsorted)
-defaults for several options
-option to not run alignment (if already run) in super script
-ckground it will throw an error and exit.
+defaults for several options  
+option to not run alignment (if already run) in super script  
+
+## leaf_loop  
+
+-i or --inputdirectory
+>Directory containing the star alignment files. Assumes that the alignment files are organized as /$InputDirectory/${SAMPLE}\_star/Alignment.bam etc. for every individual sample. For each run of the pipeline this input directory should always be the same as the the output directory for STAR. It is currently planned (but not yet implemented) for this option to default as the STAR output. As such this option is **_required if running independent of the pipeline_** otherwise will always use the star output of the given run
+
+-l or --lengthmaximum #maximum length of introns to be used in clustering
+>Defines the maximum length of the introns to be used in clustering. This argument is **_optional_** with a default value set at 100kb. 100kb is the default defined within the leafcutter script.
+
+-m or --minimumclustering #Minimum number of reads that define a cluster
+>Defines the minimum number of reads that must map to a cluster to support it. This argument is **_optional_** with a default set at 30. 30 is the default that is defined within the leafcutter script.
+
+-p or --prefix #prefix of output
+>Defines the prefix or tag you wish to use for clustering script. The prefix to be used to define your perindividual counts file. This argument is **_optional but recommended_** when running multiple iterations of leafcutter. The default output for this option is simply defined as leafcutter ie outputfile will look like leafcutter_perind.counts.gz
+
+-pc or --principalcomponents
+>Defines the number of Principle components that leafcutter generates to use as covariates when running QTL mapping. need to look into the utility of this as currently matrixeqtl does not use this. **_optional_**
+
+-r or --ratiominimum
+>Defines the minumum proportion of reads that must map to a cluster to support it. This argument is **_optional_** with a default set at 0.001. 0.001 is the default that is defined within leafcutter.
+
+-s or --samplelist
+>Defines the list of alignment samples you wish to use. this option is **_required if running independent of the pipeline_** otherwise will always use all the star samples of the given run
+
+-w or --writeto 
+>Defines the output directory for leafcutter to write to. This argument is **_optional but recommended._** Current Default is set at ~/leaf_out/
