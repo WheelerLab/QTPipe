@@ -113,9 +113,25 @@ python3 reads_per_gene_kallisto.py /path/to/abundance.tsv /desired/output/path/o
 ```
 * This bit of code is now automatically called by the loop_kallisto script and is not necessary to invoke
 
-## STAR
+## STAR  
 version 2.6.0c   
 
+**InstallingSTAR**  
+wget https://github.com/alexdobin/STAR/archive/2.6.0a.tar.gz
+tar -xzf 2.6.0a.tar.gz
+cd STAR-2.6.0a
+
+# Alternatively, get STAR source using git
+git clone https://github.com/alexdobin/STAR.git
+
+Compile under Linux
+-------------------
+
+```bash
+# Compile
+cd STAR/source
+make STAR
+```
 **Running Star** 
 
 **1. Creating an index file**  
@@ -204,14 +220,14 @@ wget "https://github.com/COMBINE-lab/salmon/releases/download/v0.10.0/salmon-0.1
 ```
 next untar the library
 ```bash
-tar xzvf Salmon-0.8.1_linux_x86_64.tar.gz
+tar xzvf salmon-0.8.1_linux_x86_64.tar.gz
 ```
 Salmon is now technically installed. The executable is located within $DIR/Salmon-0.8.1_linux_x86_64/bin/
 It can be added to the path or it can be called with a direct path to the executable. 
 personally I recommend adding it to the path.
 
 ```bash
-PATH=$PATH:/path/to/Salmon-0.8.1_linux_x86_64/bin/
+PATH=$PATH:/path/to/salmon-0.8.1_linux_x86_64/bin/
 ```  
 **Running salmon**  
 
