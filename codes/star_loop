@@ -4,7 +4,7 @@ AlignmentOutDefault=~/StarAlignments/ #
 IndexDirectoryDefault=~/starIndex/ #
 ReadFilesInDefault=zcat
 RunIndexDefault=False #
-SampNumDefualt=10 #
+SampNumDefault=10 #
 ThreadsDefault=6
 #option for are your files compressed - for us make defualt yes with zcat
 #option for genome fasta files for indexing - could provide a default for our purposes
@@ -59,10 +59,11 @@ done
 #check: That all variables are set or default
 echo "Fastq directory is ${FastqDir:?not set}"
 echo "Annotation file is ${AnnotationFile:?not set}"
-echo "Using ${Threads:=ThreadsDefault} cores"
-echo "using sample size of ${SampNum:=SampNumDefault}"
-echo "using indexing output of ${IndexDirectory:=IndexDirectoryDefault}"
-echo "sending output to ${AlignmentOut:=AlignmentOutDefault}"
+echo "Using ${Threads:=$ThreadsDefault} cores"
+echo "using sample size of ${SampNum:=$SampNumDefault}"
+echo "Running indexing: ${RunIndex:=$RunIndexDefault}"
+echo "using indexing output of ${IndexDirectory:=$IndexDirectoryDefault}"
+echo "sending output to ${AlignmentOut:=$AlignmentOutDefault}"
 
 
 
