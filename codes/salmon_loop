@@ -1,15 +1,38 @@
 #!/bin/bash
 #uncomment next line for automatic path addition
-#PATH=$PATH:~/salmon-0.10.0_linux_x86_64/bin/
+PATH=$PATH:~/salmon/bin/
+
+
+LibraryTypeDefault=A
+OutputDirectoryDefault=SalmonQuantification
 
 while :
 do
     case "$1" in
-     
-      -o | --outputprefix) #write leafcutter clustering to this directory
-      	  OutputDirectory="$2"
+      -a | --annotation) #annotation file corresponding to the genome
+          AnnotationFile="$2"
 	  shift 2
-      	  ;;
+	  ;;
+      -i | --inputdirectory) #directory containing the bam files to be processed
+	  InputDirectory="$2"  
+	  shift 2
+	  ;;
+      -l | --librarytype) #directory containing the fastq files to be processed
+	  LibraryTyper="$2"  
+	  shift 2
+	  ;;
+      -o | --outputdirectory) #directory where you'd like to send all your quantification files
+          OutputDirectory="$2"
+	  shift 2
+	  ;;
+      -s | --samplelist) 
+      	  SampleList="$2"
+	  shift 2
+	  ;;
+      -t | --transcript)
+	  TranscriptFile="$2"
+	  shift 2
+	  ;;
       -*) #unknown 
 	  echo "Error: Unknown option: $1" >&2
 	  exit 1
@@ -21,16 +44,24 @@ do
      esac
 done
 
+echo "Annotation file is ${AnnotationFile:?not set}"
+echo "Using transcript file ${TranscriptFile:?not set}"
+echo "Using input bam files located in ${InputDirectory:?not set}"
+echo "Using sample list ${SampleList:?not set}"
+echo "Writing output to ${OutputDirectory:=$OutputDirectoryDefault}"
+echo "Using library type of ${LibraryType:=$LibraryTypeDefault}"
 
-set -e
-#should add an option for output directory
-#test runs directoy is a path
-cat fastq_list_star.txt | while read fastq #iterate through the list
-if [ -d ./test_runs/"${fastq}_star"/"salmon_quant_${fastq}" ] #temporary fix - should be altered to output path in later runs
+if [ ! -d "${OutputDirectory}" ]
 then
-	rm -rf ~/test_runs/"${fastq}_star"/"salmon_quant_${fastq}" #remove any folders that might have this name
+	mkdir "${OutputDirectory}"
 fi
-do
-	salmon quant -t ~/DATA/GenCode/gencode.v28.transcripts.fa -l A -a  ~/test_runs/"${fastq}_star"/Aligned.toTranscriptome.out.bam -o ~/test_runs/"${fastq}_star"/"salmon_quant_${fastq}" --gencode -g ~/DATA/GenCode/gencode.v28.annotation.gtf
-	( head -n 1 ~/test_runs/"${fastq}_star"/"salmon_quant_${fastq}"/quant.genes.sf && tail -n +2 ~/test_runs/"${fastq}_star"/"salmon_quant_${fastq}"/quant.genes.sf | sort -k 1) > ~/test_runs/"${fastq}_star"/"salmon_quant_${fastq}"/"quant.genes.${fastq}.sorted.sf"
+cat "${SampleList}" | while read line #iterate through the list
+do 
+	Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
+	if [ -d "${OutputDirectory}"/"${Sample}_salmon" ] #temporary fix - should be altered to output path in later runs
+	then
+		rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
+	fi
+	salmon quant -t "${TranscriptFile} -l "${LibraryType} -a  "${InputDirectory}""${Sample}_star"/Aligned.toTranscriptome.out.bam -o "${OutputDirectory}"/"${Sample}_salmon" --gencode -g "${AnnotationFile}"
+	( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
 done
