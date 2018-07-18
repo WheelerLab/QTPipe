@@ -9,7 +9,7 @@ fi
 
 for file in `ls "${SampDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
 do
-	grep -m 1 "${file}" ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> ~/fastq_list_star.txt #this hardcoded path may be problematic in the future
+	grep -m 1 "${file}" ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> ~/sample_list.txt #this hardcoded path may be problematic in the future
 done
 
 #filter out all those samples that are not genotyped
