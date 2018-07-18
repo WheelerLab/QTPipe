@@ -18,7 +18,7 @@ do
 	  shift 2
 	  ;;
       -l | --librarytype) #directory containing the fastq files to be processed
-	  LibraryTyper="$2"  
+	  LibraryType="$2"  
 	  shift 2
 	  ;;
       -o | --outputdirectory) #directory where you'd like to send all your quantification files
