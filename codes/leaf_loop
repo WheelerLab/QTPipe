@@ -8,8 +8,6 @@ OutputPrefixDefault=leafcutter
 PCDefault=10
 RatioMinimumDefault=0.001
 
-#should offer sample list as an option for flexibility
-
 while :
 do
     case "$1" in
