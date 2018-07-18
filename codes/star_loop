@@ -32,8 +32,8 @@ do
 	  shift 2
 	  ;;
       -ri | --runindexing) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
-	  RunIndex=True
-	  shift 1
+	  RunIndex="$2"
+	  shift 2
 	  ;;
       -s | --samplelist) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
 	  SampList="$2"
@@ -87,7 +87,7 @@ fi
 
 #run index or not
 case "${RunIndex}" in 
-	False)
+	False | F)
 		if [ ! -d "${IndexDirectory}" ] #check: if not running indexing, then index must exist
 		then
 			echo "Warning: Indexing files not supplied and indexing not being run"
@@ -96,7 +96,7 @@ case "${RunIndex}" in
 			exit 1
 		fi
 		;;
-	True)
+	True | T)
 		if [ -z "${GenomeFiles}" ] #check: if running indexing, genome files must be provided
 		then
 			echo "Warning: Indexing being run without genome files"
