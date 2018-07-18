@@ -28,9 +28,9 @@ do
      esac
 done
 
-echo "generating ${Output:=OutputDefault}"
-echo "writing ${SampNum:=SampNumDefault} samples"
-echo "Using samples in ${SampDir:=SampDirDefault}"
+echo "generating ${Output:=$OutputDefault}"
+echo "writing ${SampNum:=$SampNumDefault} samples"
+echo "Using samples in ${SampDir:=$SampDirDefault}"
 
 
 #create list of samples and their corresponding names
