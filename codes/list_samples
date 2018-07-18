@@ -1,16 +1,48 @@
-SampDir=~/Data/gEUVADIS_RNASeq/
-SampNum=$1
+SampDirDefault=~/Data/gEUVADIS_RNASeq/
+OutputDefault=~/sample_list.txt
+SampNumDefault=89
+
+while :
+do
+    case "$1" in
+      -i | --inputdirectory) #directory containing the fastq files to be processed
+	  SampDir="$2"  
+	  shift 2
+	  ;;
+      -o | --outputdirectory) #directory where you'd like to send all your alignments
+          Output="$2"
+	  shift 2
+	  ;;
+      -s | --samplenumber) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
+	  SampNum="$2"
+	  shift 2
+	  ;;
+      -*) #unknown 
+	  echo "Error: Unknown option: $1" >&2
+	  exit 1
+	  ;;
+      *)  # No more options
+	  shift
+	  break
+	  ;;
+     esac
+done
+
+echo "generating ${Output:=OutputDefault}"
+echo "writing ${SampNum:=SampNumDefault} samples"
+echo "Using samples in ${SampDir:=SampDirDefault}"
+
 
 #create list of samples and their corresponding names
-if [ -e ~/sample_list.txt ] #remove any files with this name to start with
+if [ -e "${Output}" ] #remove any files with this name to start with
 then
-  rm ~/sample_list.txt 
+	rm "${Output}" 
 fi 
 
 for file in `ls "${SampDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
 do
-	grep -m 1 "${file}" ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> ~/sample_list.txt #this hardcoded path may be problematic in the future
+	grep -m 1 "${file}" ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> "${Output}" 
 done
 
 #filter out all those samples that are not genotyped
-Rscript ~/scripts/sample_filtering.R ~/sample_list.txt ~/Data/GEU_SNPs.txt
+Rscript ~/scripts/sample_filtering.R "${Output}" ~/Data/GEU_SNPs.txt
