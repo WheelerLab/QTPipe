@@ -1,0 +1,142 @@
+
+while :
+do
+    case "$1" in
+                                          #list_samples_options
+      -i | --inputdirectory) #directory containing the sample files to be processed
+	  SampDir="$2"  
+	  shift 2
+	  ;;
+      -o | --outputdirectory) #directory where you'd like to send your sample list
+          Output="$2"
+	  shift 2
+	  ;;
+      -s | --samplenumber) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 89.
+	  SampNum="$2"
+	  shift 2
+	  ;;
+                                          #Star options
+      -a | --annotation) #annotation file corresponding to the genome
+          AnnotationFile="$2"
+	  shift 2
+	  ;;
+      -g | --genomefastafiles) #file path to the genome files for indexing. Must be supplied when -ri is supplied
+          GenomeFiles="$2"
+	  shift 2
+	  ;;
+      -i | --inputdirectory) #directory containing the fastq files to be processed
+	  FastqDir="$2"  
+	  shift 2
+	  ;;
+      -id | --indexingdirectory) #when supplied alone, indexing has been run, and points to the index directory. When supplied with -ri, serves as output directory for indexing.
+	  IndexDirectory="$2"
+	  shift 2
+	  ;;
+      -o | --outputdirectory) #directory where you'd like to send all your alignments
+          AlignmentOut="$2"
+	  shift 2
+	  ;;
+      -ri | --runindexing) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
+	  RunIndex="$2"
+	  shift 2
+	  ;;
+      -s | --samplelist) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
+	  SampList="$2"
+	  shift 2
+	  ;;
+      -t | --threads) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
+	  Threads="$2"
+	  shift 2
+	  ;;
+                                                    #Leafcutter options
+      -i | --inputdirectory) #Directory containing the star alignment files (assumes individual sample directories)
+      	  InputDirectory="$2"
+	  shift 2
+	  ;;
+      -l | --lengthmaximum) #maximum length of introns to be used in clustering
+      	  LengthMaximum="$2"
+	  shift 2
+	  ;;
+      -m | --minimumclustering) #Minimum number of reads that define a cluster
+      	  MinimumClustering="$2"
+	  shift 2
+	  ;;
+      -p | --prefix) #prefix of output
+      	  OutputPrefix="$2"
+	  shift 2
+	  ;;
+      -pc | --principalcomponents) #How many PCs do you wish to generate
+	  PC="$2"
+	  shift 2
+	  ;;
+      -r | --ratiominimum) #The minimum ratio of reads that must map to support a cluster
+      	  RatioMinimum="$2"
+	  shift 2
+	  ;;
+      -s | --samplelist) 
+      	  SampleList="$2"
+	  shift 2
+	  ;;
+      -w | --writeto) #write leafcutter clustering to this directory
+      	  OutputDirectory="$2"
+	  shift 2
+      	  ;;
+    
+                                                        #salmon options
+      -a | --annotation) #annotation file corresponding to the genome
+          AnnotationFile="$2"
+	  shift 2
+	  ;;
+      -i | --inputdirectory) #directory containing the bam files to be processed
+	  InputDirectory="$2"  
+	  shift 2
+	  ;;
+      -l | --librarytype) #directory containing the fastq files to be processed
+	  LibraryType="$2"  
+	  shift 2
+	  ;;
+      -o | --outputdirectory) #directory where you'd like to send all your quantification files
+          OutputDirectory="$2"
+	  shift 2
+	  ;;
+      -s | --samplelist) 
+      	  SampleList="$2"
+	  shift 2
+	  ;;
+      -t | --transcript)
+	  TranscriptFile="$2"
+	  shift 2
+	  ;;
+    
+                                                      #generic options
+      -*) #unknown 
+	  echo "Error: Unknown option: $1" >&2
+	  exit 1
+	  ;;
+      *)  # No more options
+	  shift
+	  break
+	  ;;
+     esac
+done
+
+
+
+
+fastqc
+
+~/codes/list_samples --inputdirectory "${}" --outputdirectory "${}" --samplenumber "${}"
+
+~/codes/star_loop --annotation "${}" --genomefastafiles "${}" --inputdirectory "${}" --indexingdirectory "${}" --outputdirectory "${}" --runindexing "${}" --samplelist "${}" --threads "${}"
+
+~/codes/leaf_loop --inputdirectory "${}" --lengthmaximum "${}" --minimumclustering "${}" --prefix "${}" --principalcomponents "${}" --ratiominimum "${}" --samplelist "${}" --writeto "${}"
+
+~/codes/salmon_loop --annotation --inputdirectory --librarytype --outputdirectory --samplelist --transcript
+
+
+
+sort & filter
+
+matrix eqtl - eqtl analysis
+
+matrix eqtl - sqtl analysis
