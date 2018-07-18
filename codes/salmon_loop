@@ -4,7 +4,7 @@ PATH=$PATH:~/salmon/bin/
 
 
 LibraryTypeDefault=A
-OutputDirectoryDefault=SalmonQuantification
+OutputDirectoryDefault=SalQuant
 
 while :
 do
@@ -62,6 +62,6 @@ do
 	then
 		rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
 	fi
-	salmon quant -t "${TranscriptFile} -l "${LibraryType} -a  "${InputDirectory}""${Sample}_star"/Aligned.toTranscriptome.out.bam -o "${OutputDirectory}"/"${Sample}_salmon" --gencode -g "${AnnotationFile}"
+	salmon quant -t "${TranscriptFile}" -l "${LibraryType}" -a  "${InputDirectory}"/"${Sample}_star"/Aligned.toTranscriptome.out.bam -o "${OutputDirectory}"/"${Sample}_salmon" --gencode -g "${AnnotationFile}"
 	( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
 done
