@@ -4,7 +4,6 @@ AlignmentOutDefault=~/StarAlignments/ #
 IndexDirectoryDefault=~/starIndex/ #
 ReadFilesInDefault=zcat
 RunIndexDefault=False #
-SampNumDefault=10 #
 ThreadsDefault=6
 #option for are your files compressed - for us make defualt yes with zcat
 #option for genome fasta files for indexing - could provide a default for our purposes
@@ -36,8 +35,8 @@ do
 	  RunIndex=True
 	  shift 1
 	  ;;
-      -s | --samplenumber) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
-	  SampNum="$2"
+      -s | --samplelist) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
+	  SampList="$2"
 	  shift 2
 	  ;;
       -t | --threads) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
@@ -59,13 +58,32 @@ done
 #check: That all variables are set or default
 echo "Fastq directory is ${FastqDir:?not set}"
 echo "Annotation file is ${AnnotationFile:?not set}"
+echo "Sample List is ${SampList:?not set}"
 echo "Using ${Threads:=$ThreadsDefault} cores"
 echo "using sample size of ${SampNum:=$SampNumDefault}"
 echo "Running indexing: ${RunIndex:=$RunIndexDefault}"
 echo "using indexing output of ${IndexDirectory:=$IndexDirectoryDefault}"
 echo "sending output to ${AlignmentOut:=$AlignmentOutDefault}"
 
-
+#verify the validity of required inputs
+if [ ! -d "${FasqDir}" ]
+then 
+	echo "Warning: ${FastqDir} DNE. Please supply input directory with -i argument"
+	echo "Exiting"
+	exit 1 
+fi
+if [ ! -e "${AnnotationFile}" ]
+then
+	echo "Warning: ${AnnotationFile} DNE. Please supply file with -a argument"
+	echo "Exiting"
+	exit 1
+fi
+if [ ! -e "${SampleList}" ]
+then
+	echo "Warning: ${SampleList} DNE. Please supply file with -s argument"
+	echo "Exiting"
+	exit 1
+fi
 
 #run index or not
 case "${RunIndex}" in 
@@ -95,25 +113,12 @@ case "${RunIndex}" in
 esac
 
 
-#now create list of samples and their corresponding names
-#if [ -e ~/fastq_list_star.txt ] #remove any files with this name to start with
-#then
-#	rm ~/fastq_list_star.txt 
-#fi 
-#for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
-#do
-#	grep -m 1 "${file}" ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> ~/fastq_list_star.txt #this hardcoded path may be problematic in the future
-#done
-#Rscript ~/scripts/sample_filtering.R ~/fastq_list_star.txt ~/Data/GEU_SNPs.txt
-
-
-
 #now perform the actual alignment
 if [ ! -d "${AlignmentOut}" ]
 then
 	mkdir "${AlignmentOut}"
 fi
-cat ~/fastq_list_star.txt | while read line #iterate through the list
+cat "${SampleList}" | while read line #iterate through the list
 do
 	Fastq=$( echo "${line}" | cut -f 2 -d$'\t' )
 	Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
