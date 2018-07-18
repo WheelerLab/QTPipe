@@ -96,15 +96,15 @@ esac
 
 
 #now create list of samples and their corresponding names
-if [ -e ~/fastq_list_star.txt ] #remove any files with this name to start with
-then
-	rm ~/fastq_list_star.txt 
-fi 
-for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
-do
-	grep -m 1 "${file}" ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> ~/fastq_list_star.txt #this hardcoded path may be problematic in the future
-done
-Rscript ~/scripts/sample_filtering.R ~/fastq_list_star.txt ~/Data/GEU_SNPs.txt
+#if [ -e ~/fastq_list_star.txt ] #remove any files with this name to start with
+#then
+#	rm ~/fastq_list_star.txt 
+#fi 
+#for file in `ls "${FastqDir}"*fastq.gz | cut -f 6 -d '/' | cut -f 1 -d '_' | uniq | head -n "${SampNum}"` #generate fastq list from scratch
+#do
+#	grep -m 1 "${file}" ~/E-GEUV-1.sdrf.txt | cut -f 28,1 -d$'\t' >> ~/fastq_list_star.txt #this hardcoded path may be problematic in the future
+#done
+#Rscript ~/scripts/sample_filtering.R ~/fastq_list_star.txt ~/Data/GEU_SNPs.txt
 
 
 
@@ -113,7 +113,7 @@ if [ ! -d "${AlignmentOut}" ]
 then
 	mkdir "${AlignmentOut}"
 fi
-cat fastq_list_star.txt | while read line #iterate through the list
+cat ~/fastq_list_star.txt | while read line #iterate through the list
 do
 	Fastq=$( echo "${line}" | cut -f 2 -d$'\t' )
 	Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
@@ -123,5 +123,5 @@ do
 	fi
 	mkdir "${AlignmentOut}""${Sample}_star" #make the directory
 	cd "${AlignmentOut}""${Sample}_star" #go to that directory
-	STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${Fastq}"* --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}"
+	/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${Fastq}"*.gz --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}"
 done
