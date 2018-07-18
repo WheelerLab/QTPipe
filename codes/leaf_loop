@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LeafcutterLocDefault=~/leafcutter/
+LeafcutterLocDefault=~/software/leafcutter/
 LengthMaximumDefault=100000
 MinimumClusteringDefault=30
 OutputDirectoryDefault=~/leaf_out/
@@ -84,7 +84,7 @@ cat "${SampleList}" | while read line #iterate through the list
 do
 	Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
 	echo Converting "${Sample}" associated Aligned.out.bam to "${Sample}.junc"
-	sh $LeafcutterLoc/scripts/bam2junc.sh "${InputDirectory}"*"${Sample}"*.bam "${OutputDirectory}""${Sample}.junc"
+	sh $LeafcutterLoc/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}_star"/Aligned.out.bam "${OutputDirectory}""${Sample}.junc"/
 	echo "${Sample}.junc" >> "${OutputDirectory}"/juncfiles.txt
 done
 
