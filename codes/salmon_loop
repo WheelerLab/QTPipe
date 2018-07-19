@@ -4,7 +4,7 @@ PATH=$PATH:~/salmon/bin/
 
 
 LibraryTypeDefault=A
-OutputDirectoryDefault=SalQuant
+OutputDirectoryDefault=~/SalQuant
 
 while :
 do
@@ -69,3 +69,4 @@ do
 	salmon quant -t "${TranscriptFile}" -l "${LibraryType}" -a  "${InputDirectory}"/"${Sample}_star"/Aligned.toTranscriptome.out.bam -o "${OutputDirectory}"/"${Sample}_salmon" --gencode -g "${AnnotationFile}"
 	( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
 done
+
