@@ -122,11 +122,11 @@ cat "${SampleList}" | while read line #iterate through the list
 do
 	Fastq=$( echo "${line}" | cut -f 2 -d$'\t' )
 	Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
-	if [ -d "${AlignmentOut}""${Sample}_star" ] 
+	if [ -d "${AlignmentOut}"/"${Sample}_star" ] 
 	then
-		rm -rf "${AlignmentOut}""${Sample}_star" #remove any folders that might have this name
+		rm -rf "${AlignmentOut}"/"${Sample}_star" #remove any folders that might have this name
 	fi
 	mkdir "${AlignmentOut}""${Sample}_star" #make the directory
 	cd "${AlignmentOut}""${Sample}_star" #go to that directory
-	/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}""${Fastq}"*.gz --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}"
+	/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq}"*.gz --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}"
 done
