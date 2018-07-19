@@ -1,4 +1,5 @@
 #install.packages("tidyr")
+#devtools::install_github("argparse", "trevorld")
 suppressPackageStartupMessages(library(argparse))
 suppressPackageStartupMessages(library(rlang))
 suppressPackageStartupMessages(library(tidyr))
@@ -10,9 +11,7 @@ parser$add_argument("-q", "--quantdir", help="file path of directory containing 
 parser$add_argument("-o", "--outputdir", help="file path of the snp genotype file")
 args <- parser$parse_args()
 
-if ( ! exists(args$outputdir) ) {
-  args$outputdir <- args$quantdir
-}
+
 #this chunk can be made more efficient
 #also keep track of directories - these will be inputs for optparse
 files <- list.files(path = args$quantdir , pattern = "[0123456789]+\\.sorted\\.genes\\.quant\\.sf", recursive = T)
