@@ -37,9 +37,9 @@ do
   Fastq=$( echo "${line}" | cut -f 2 -d$'\t' )
   Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
 	/usr/local/bin/FastQC/fastqc "${InputDir}"/"${Fastq}_1.fastq.gz" "${InputDir}"/"${Fastq}_2.fastq.gz" 
-  unzip "${InputDir}"/"${Fastq}_1_fastqc.zip" "${InputDir}"/"${Fastq}_1_fastqc"/summary.txt
+  unzip "${InputDir}"/"${Fastq}_1_fastqc.zip" "${Fastq}_1_fastqc"/summary.txt -d "${InputDir}"
   ( printf "${Fastq}_1.fastq\t${Sample}\t" && cut "${InputDir}"/"${Fastq}_1_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputfile}"
-  unzip "${InputDir}"/"${Fastq}_2_fastqc.zip" "${InputDir}"/"${Fastq}_2_fastqc"/summary.txt
+  unzip "${InputDir}"/"${Fastq}_2_fastqc.zip" "${Fastq}_2_fastqc"/summary.txt -d "${InputDir}"
   ( printf "${Fastq}_2.fastq\t${Sample}\t" && cut "${Fastq}_2_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputfile}"
 done
 
