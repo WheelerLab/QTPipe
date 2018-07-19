@@ -5,6 +5,7 @@ TranscriptFileDefault=~/Data/GenCode/gencode.v28.transcripts.fa
 GenomeFileDefault=~/Data/GenCode/GRCh38.primary_assembly.genome.fa
 BamDirectoryDefault=~/StarAlignments
 FastqDirDefault=~/Data/GenCode/gEUVADIS_RNASeq
+QuantOutputDefault=~/SalQuant
 while :
 do
     case "$1" in
@@ -30,7 +31,7 @@ do
 	  shift 2
 	  ;;
       -q | --quantoutput) #directory where you'd like to send all your quantification files
-          QuantOutputDirectory="$2"
+          QuantOutput="$2"
 	  shift 2
 	  ;;
       -s | --samplelist) #list of all samples that will be processed
@@ -183,9 +184,8 @@ done
 
 ~/codes/leaf_loop --inputdirectory "${BamDirectory:=$BamDirectoryDefault}" --lengthmaximum "${}" --minimumclustering "${}" --prefix "${}" --principalcomponents "${}" --ratiominimum "${}" --samplelist "${SampleListOut:=}" --writeto "${}"
 
-~/codes/salmon_loop --annotation "${AnnotationFile:=$AnnotationFileDefault}" --inputdirectory "${BamDirectory:=$BamDirectory}" --librarytype --outputdirectory "${QuantOutput:=}" --samplelist "${SampleListOut:=}" --transcript "${TranscriptFile:=$TranscriptFileDefault}"
-
-
+~/codes/salmon_loop --annotation "${AnnotationFile:=$AnnotationFileDefault}" --inputdirectory "${BamDirectory:=$BamDirectory}" --librarytype --outputdirectory "${QuantOutput:=QuantOutputDefault}" --samplelist "${SampleListOut:=}" --transcript "${TranscriptFile:=$TranscriptFileDefault}"
+~/codes/Salmon_parser.R -o -q "${QuantOutput:=}" -a "${AnnotationFile:=$AnnotationFileDefault}"
 
 sort & filter
 
