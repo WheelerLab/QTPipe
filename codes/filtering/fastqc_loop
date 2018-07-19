@@ -40,7 +40,7 @@ do
   unzip "${InputDir}"/"${Fastq}_1_fastqc.zip" "${Fastq}_1_fastqc"/summary.txt -d "${InputDir}"
   ( printf "${Fastq}_1.fastq\t${Sample}\t" && cut "${InputDir}"/"${Fastq}_1_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputfile}"
   unzip "${InputDir}"/"${Fastq}_2_fastqc.zip" "${Fastq}_2_fastqc"/summary.txt -d "${InputDir}"
-  ( printf "${Fastq}_2.fastq\t${Sample}\t" && cut "${Fastq}_2_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputfile}"
+  ( printf "${Fastq}_2.fastq\t${Sample}\t" && cut "${InputDir}"/"${Fastq}_2_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputfile}"
 done
 
 grep "FAIL" "${Outputfile}" | sort -u > "${Outputfile}_fail"
