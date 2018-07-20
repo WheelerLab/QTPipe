@@ -183,9 +183,14 @@ done
 ~/codes/star_loop --annotation "${AnnotationFile:=$AnnotationFileDefault}" --genomefastafiles "${GenomeFile:=$GenomeFileDefault}" --inputdirectory "${FastqDir:=$FastqDirDefault}" --indexingdirectory "${BamDirectory:=}" --outputdirectory "${}" --runindexing "${}" --samplelist "${SampleListOut:=}" --threads "${}"
 
 ~/codes/leaf_loop --inputdirectory "${BamDirectory:=$BamDirectoryDefault}" --lengthmaximum "${}" --minimumclustering "${}" --prefix "${}" --principalcomponents "${}" --ratiominimum "${}" --samplelist "${SampleListOut:=}" --writeto "${}"
+for qqnorm in ${writeleaf}*qqnorm*
+do
+	python3 qqnormparser.py $qqnorm
+done
 
 ~/codes/salmon_loop --annotation "${AnnotationFile:=$AnnotationFileDefault}" --inputdirectory "${BamDirectory:=$BamDirectory}" --librarytype --outputdirectory "${QuantOutput:=QuantOutputDefault}" --samplelist "${SampleListOut:=}" --transcript "${TranscriptFile:=$TranscriptFileDefault}"
-~/codes/Salmon_parser.R -o -q "${QuantOutput:=}" -a "${AnnotationFile:=$AnnotationFileDefault}"
+~/codes/Salmon_parser.R -o "${QuantOutput:=}"/expression_location -q "${QuantOutput:=}" -a "${AnnotationFile:=$AnnotationFileDefault}"
+
 
 sort & filter
 
