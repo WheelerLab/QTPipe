@@ -36,7 +36,7 @@ print("total annotation data frame generated")
 for (i in 1:22){
   chr_annotation <- filter(total_annotation, chr == paste("chr", i, sep=""))
   write.table(x =select(semi_join(chr_annotation, TPM, by ="gene_id"), "gene_id", "chr", "start", "stop"), file = paste(args$outputdir, "/location_sal_chr",i,sep=""), row.names = F, quote = F)#location file
-  write.table(x =semi_join(TPM, chr_annotation, by = "gene_id"),file = paste(args$outputdir, "/expression_sal_chr",i,sep=""), row.names = F, quote = F)
+  write.table(x =arrange(semi_join(TPM, chr_annotation, by = "gene_id") , by = "gene_id"),file = paste(args$outputdir, "/expression_sal_chr",i,sep=""), row.names = F, quote = F)
   print(paste("chr",i,"processed"))
 }
 
