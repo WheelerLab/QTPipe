@@ -9,6 +9,34 @@ This outline is intended to be a living document, with examples and descriptions
 
 ## Basic Flowgram
 
+1. Subset your samples (filter)
+2. Generate FastQC report
+3. Align samples to both genomic and transcriptomic coordinates
+4. eQTL & sQTL analysis
+      4a. Salmon quantification (parse & filter)
+      4b. Leafcutter spllicing analysis & file processing (parse & filter)
+      4c. SNP file processing (parse &filter)
+      4d. MatrixeQTL x2
+
+## Pipeline options
+
+# Individual Scripts & Their Options
+
+## list samples
+
+The list_samples script, so aptly named, lists the subset of samples you wish to process in the ofrmat required by the rest of the pipeline. While creating this pipeline it was found that the sample RNA data was tagged differently from how they were labelled within the SNP files. This posed a problem for downstream processing as matrixEQTL requires that sample names be consistent between our SNP and our gene files. As a solution a simple "translation" step was added within the star_loop script. This would simply rename a given sample to its corresponding genotyped sample. this requires a two column file, with the translated names in the first column and the corresponding untranslated names in the second cloumn. This script makes it simple to generate this list that will be used by star as well as all other codes downstream of it. Currently the file that it uses to translate samples is hardcoded. expect this as an options update in the future. Additionally this script also filters out those samples that are not already genotyped and thus cannot be used for downstream analysis. This filtering step is not currently optional and anyone wishing to process said samples will need to do so independently of genotyped samples.
+
+The renaming step creates a problem in portabiliy. The translation step had to be incorporated in all code downstream of this application. Anyone wishing to run this pipeline on samples that do not need this name change (or whose name change follows a different format than the one specified) will run into errors while running this pipeline. A more portable code is in the works, but for now do not hesitate to contact the developer who will gladly help you with this issue. 
+
+**options**
+-i or --inputdirectory
+> Specifies the directory containing the fastq files to be processed. This is a **required option.** Currently this option defaults to the developers directory for quick and easy in lab usage.
+
+-o or --outputdirectory) 
+>specifies the outtput file you'd like to send file. Can include the full path of the file. Otherwise defualts to generating a file at ~/sample_list.txt
+
+-s or --samplenumber
+>Specifies how many samples you wish to process. Must be less than or equal to the number of samples/sample pairs.
 ## Star_loop  
 
 The star_loop script is intended to loop STAR alignment steps to both genomic and transcriptomic contexts. The basic required files are an uncompressed annotation file (.gtf), an uncompressed genome file (.fa), and any number of paired end compressed read files (.fa.gz). Because this script is an implementation of STAR, many of the options included are based on the standard STAR options with reasonable defaults provided for this lab.
