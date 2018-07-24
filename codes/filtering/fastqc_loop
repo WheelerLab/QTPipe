@@ -43,4 +43,5 @@ do
   ( printf "${Fastq}_2.fastq\t${Sample}\t" && cut "${InputDir}"/"${Fastq}_2_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputfile}"
 done
 
+printf "Fastq tag\tSample\tBasic Statistics\tPer base sequence quality\tPer tile sequence quality\tPer sequence quality scores\tPer base sequence content\tPer sequence GC content\tPer base N content\tSequence Length Distribution\tSequence Duplication Levels\tOverrepresented sequences\tAdapter Content\n" > "${Outputfile}_fail"
 grep "FAIL" "${Outputfile}" | sort -u > "${Outputfile}_fail"
