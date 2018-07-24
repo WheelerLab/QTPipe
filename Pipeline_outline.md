@@ -12,17 +12,20 @@ This outline is intended to be a living document, with examples and descriptions
 1. Subset your samples (filter)
 2. Generate FastQC report
 3. Align samples to both genomic and transcriptomic coordinates
-4. eQTL & sQTL analysis
-      4a. Salmon quantification (parse & filter)
-      4b. Leafcutter spllicing analysis & file processing (parse & filter)
-      4c. SNP file processing (parse &filter)
-      4d. MatrixeQTL x2
+4. eQTL & sQTL analysis  
+      4a. Salmon quantification (parse & filter)  
+      4b. Leafcutter spllicing analysis & file processing (parse & filter)  
+      4c. SNP file processing (parse &filter)  
+      4d. MatrixeQTL x2  
 
-## Pipeline options
+## Pipeline options  
+In general The options of this pipeline fall into two categories, shared and specific. As they may sound, shared options are those that connect the different scripts of this pipeline. These options entail both raw data and its flow from one ource to another. This includes reference files, sample data, and the inputs and outputs from one script to another. On the pipeline level, these are all meant to be set with adequate defaults so that the only information the user typically must provide is the raw input data as well as the necessary reference files. These options include all required options that the user must supply the pipeline. On the level of the individual scripts, these are options that do not have a set default (although they are set in the pipeline superscript).   The majority of options fall into this category. 
+
+In contrast are specific options which correspond to features found only in a particular script. These options include such features as deciding the minimum clustering size for leafcutter analysis or specifying what library type Salmon should use for its analysis. These arguments tend to be optional, with most if not all having defined within their own scripts a default value. They can still easily be accessed on the super script level.
 
 # Individual Scripts & Their Options
 
-## list samples
+## list_samples
 
 The list_samples script, so aptly named, lists the subset of samples you wish to process in the ofrmat required by the rest of the pipeline. While creating this pipeline it was found that the sample RNA data was tagged differently from how they were labelled within the SNP files. This posed a problem for downstream processing as matrixEQTL requires that sample names be consistent between our SNP and our gene files. As a solution a simple "translation" step was added within the star_loop script. This would simply rename a given sample to its corresponding genotyped sample. this requires a two column file, with the translated names in the first column and the corresponding untranslated names in the second cloumn. This script makes it simple to generate this list that will be used by star as well as all other codes downstream of it. Currently the file that it uses to translate samples is hardcoded. expect this as an options update in the future. Additionally this script also filters out those samples that are not already genotyped and thus cannot be used for downstream analysis. This filtering step is not currently optional and anyone wishing to process said samples will need to do so independently of genotyped samples.
 
@@ -30,13 +33,28 @@ The renaming step creates a problem in portabiliy. The translation step had to b
 
 **options**
 -i or --inputdirectory
-> Specifies the directory containing the fastq files to be processed. This is a **required option.** Currently this option defaults to the developers directory for quick and easy in lab usage.
+> Specifies the directory containing the fastq files to be processed. This is a **_required option._** Currently this option defaults to the developers directory for quick and easy in lab usage.
 
 -o or --outputdirectory) 
->specifies the outtput file you'd like to send file. Can include the full path of the file. Otherwise defualts to generating a file at ~/sample_list.txt
+>specifies the outtput file you'd like to send file. Can include the full path of the file. Otherwise defualts to generating a file at ~/sample_list.txt. **_optional argument_**
 
 -s or --samplenumber
->Specifies how many samples you wish to process. Must be less than or equal to the number of samples/sample pairs.
+>Specifies how many samples you wish to process. Must be less than or equal to the number of samples/sample pairs. By default this option selects 89 samples as that is the total number of test samples available. **_recommended argument._** An option to simply run the pipeline on the entire directory of fastq samples is not currently in placed, but this can be achieved by inputing the total number of samples.
+
+## fastqc_loop
+
+This script iterates FastQC over the entirety of the sample list including all paired end samples that share a sample tag. It then outputs two summary files, one containing the pass/fail stats for all samples and another containing the pass/fail stats for only those fastq files with at least 1 failing statistic.
+
+-f or --fastqdir
+>directory containing the fastq files to be processed. This is a **_required option_**
+
+-o or --output
+>directory where you'd like to send all your quantification files
+
+-s or --samplelist
+>a list of all the samples you're going to process. This sample list should follow the format as laid out in the list_samples code
+
+
 ## Star_loop  
 
 The star_loop script is intended to loop STAR alignment steps to both genomic and transcriptomic contexts. The basic required files are an uncompressed annotation file (.gtf), an uncompressed genome file (.fa), and any number of paired end compressed read files (.fa.gz). Because this script is an implementation of STAR, many of the options included are based on the standard STAR options with reasonable defaults provided for this lab.
@@ -104,9 +122,9 @@ argument to run on an entire directory
 means to easily generate sample list  
 overwrite/do not replace option  
 
+## qqnormparser.py 
 
-
-# Salmon_loop  
+## Salmon_loop  
 
 -a or --annotation 
 >Defines the full path of the annotation file for the genome being used. This is a **_required argument_**.
@@ -117,8 +135,8 @@ overwrite/do not replace option
 -l | --librarytype)
 >The lib type defines a feature granted by Salmon. Salmon requires that you input what type of alignment you have, whether paired end, single end etc. Salmon provides an A option by which it can automatically infer what type of reads are used. This is used as a default here. As such this argument is **_optional_** but recommended if the lib type is known. For full list of library types please see the [salmon documentation](http://salmon.readthedocs.io/en/latest/salmon.html#what-s-this-libtype).
 
--o | --outputdirectory) #directory where you'd like to send all your quantification files
->Output directory where you would like to send your quantification files. Outputs will be structured as $OutputDirectory/${Sample}\_salmon etc. with each ${Sample}\_salmon being a directory that contains the quant.sf files for each sample. These files will be independently compiled into a single expression file in order for matrixEQTL processing. **_optional_**
+-o | --outputdirectory) 
+>Output directory where you would like to send your quantification files. Outputs will be structured as $OutputDirectory/${Sample}\_salmon etc. with each ${Sample}\_salmon being a directory that contains the quant.sf files for each sample. These files will be independently compiled into a single expression file in order for matrixEQTL processing. **warning** it is very important that this directory not have any unwanted quantification files already within it, particularly when running within the pipeline as this will create problems downstream. This is thus a **_recommended_** option
 
 -s | --samplelist) 
 >The list of samples you would like to process with salmon. This option is provided in order to let one easily subset the alignments you wish to quantify. To run on all samples, simply feed it a complete list of samples. Sample lists assume the structure of the fastq list generated by the star_loop script. This is a **_required_** argument.
@@ -126,3 +144,26 @@ overwrite/do not replace option
 -t | --transcript)
 >Defines the full path to the transcript file of the genome. This is a **_required_** option.
 
+## Salmon_Parser.R
+
+When Salmon generates its quantification outputs, it does so by generating a new directory for each sample. In order to process these files with MatrixEQTL it is necessary to combine each output into one single file. Salmon parser runs on an entire directory containing the subdirectories output by salmon. It is important to note that salmon_parser will parse _all_ quantification files found within this directory and not just the ones within the original sample list. It is thus important to keep all your quantification subsets in different directories if you don't want them included in your quantification. At the same time it is important to filter out any genes with significantly low variance to avoid large volume of non significant genes-SNP pairs from being identified by MatrixEQTL. The parser requires the input of an annotation (.gtf) file as well as the quantification directory containing all of the sample quantifications to be processed. Will output an expression file and a location file for each chromosome
+
+-a or --annotation file
+>Defines the full path of the annotation file for the genome being used. This is a **_required argument_**. Salmon_parser uses the annotation to assign gene locations and chr num to the quantified genes as salmon fails to write this out.
+
+-m or --meanthreshold
+>The minimum mean expression that the gene must have across all samples. By default this threshold is 0.1. Any gene with mean expression below this threshold is removed from both the expression and the location file. This argument is **_optional_** however it is recommended that threholds above 0 be used if provided.
+
+-o or --outputdir
+>The path to the output directory. This is **_required_** as no default exists.
+
+-q or --quantdir
+>The path to the input directory containing the salmon quantifications you would like to process. Note that Salmon_parser will run on *all* quantification files within this directory and its subdirectories and not just those most recently generated by salmon. This is a **_required_** option.
+
+-s or --scaledthreshold
+>The threshold for normalized variance across gene samples for filtering. As variance is both positive and negative, this filters out those genes whose normalized variation lies between +threshold to -threshold inclusively. Variation is normalized using R's scale(0 function. This option has a defualt of 0. In testing it has been found that this option is very sensitive in filtering out genes and that it is difficult to judge an appropriate threshold for filtering. As such it is actually **_not recommended_** for use and will likely be removed in later iterations.
+
+-v or --variance threshold
+>The threshold for variance across gene samples for filtering. As variance is both positive and negative, this filters out those genes whose variation lies between +threshold to -threshold inclusively. This option is set with a default of 0.1. This default was found to be adequate to remove overrepresented insignificant gene-snp pairs from matrix-eqtl analysis that would skew our results. This argument is **_optional_**
+
+## SNP Parser
