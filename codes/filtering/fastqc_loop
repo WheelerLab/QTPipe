@@ -1,5 +1,5 @@
 #!/bin/bash
-OutputfileDefault=~/Summary_FastQC
+OutputdirDefault=~
 while :
 do
     case "$1" in
@@ -8,7 +8,7 @@ do
 	        shift 2
 	        ;;
       -o | --output) #directory where you'd like to send all your quantification files
-          Outputfile="$2"
+          Outputdir="$2"
 	        shift 2
 	        ;;
       -s | --samplelist) #a list of all the samples you're going to process
@@ -28,9 +28,9 @@ done
 
 echo "Fastq directory is ${InputDir:?not set}"
 echo "Sample List is ${SampleList:?not set}"
-echo "Sending output to ${Outputfile:=$OutputfileDefault}"
+echo "Sending output to ${Outputdir:=$OutputdirDefault}"
 
-printf "Fastq tag\tSample\tBasic Statistics\tPer base sequence quality\tPer tile sequence quality\tPer sequence quality scores\tPer base sequence content\tPer sequence GC content\tPer base N content\tSequence Length Distribution\tSequence Duplication Levels\tOverrepresented sequences\tAdapter Content\n" > "${Outputfile}"
+printf "Fastq tag\tSample\tBasic Statistics\tPer base sequence quality\tPer tile sequence quality\tPer sequence quality scores\tPer base sequence content\tPer sequence GC content\tPer base N content\tSequence Length Distribution\tSequence Duplication Levels\tOverrepresented sequences\tAdapter Content\n" > "${Outputfile}"/Summary_FastQC
 
 cat "${SampleList}" | while read line #iterate through the list
 do
@@ -38,10 +38,10 @@ do
   Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
 	/usr/local/bin/FastQC/fastqc "${InputDir}"/"${Fastq}_1.fastq.gz" "${InputDir}"/"${Fastq}_2.fastq.gz" 
   unzip -n "${InputDir}"/"${Fastq}_1_fastqc.zip" "${Fastq}_1_fastqc"/summary.txt -d "${InputDir}"
-  ( printf "${Fastq}_1.fastq\t${Sample}\t" && cut "${InputDir}"/"${Fastq}_1_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputfile}"
+  ( printf "${Fastq}_1.fastq\t${Sample}\t" && cut "${InputDir}"/"${Fastq}_1_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputfile}"/Summary_FastQC
   unzip -n "${InputDir}"/"${Fastq}_2_fastqc.zip" "${Fastq}_2_fastqc"/summary.txt -d "${InputDir}"
-  ( printf "${Fastq}_2.fastq\t${Sample}\t" && cut "${InputDir}"/"${Fastq}_2_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputfile}"
+  ( printf "${Fastq}_2.fastq\t${Sample}\t" && cut "${InputDir}"/"${Fastq}_2_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputfile}"/Summary_FastQC
 done
 
-printf "Fastq tag\tSample\tBasic Statistics\tPer base sequence quality\tPer tile sequence quality\tPer sequence quality scores\tPer base sequence content\tPer sequence GC content\tPer base N content\tSequence Length Distribution\tSequence Duplication Levels\tOverrepresented sequences\tAdapter Content\n" > "${Outputfile}_fail"
-grep "FAIL" "${Outputfile}" | sort -u > "${Outputfile}_fail"
+printf "Fastq tag\tSample\tBasic Statistics\tPer base sequence quality\tPer tile sequence quality\tPer sequence quality scores\tPer base sequence content\tPer sequence GC content\tPer base N content\tSequence Length Distribution\tSequence Duplication Levels\tOverrepresented sequences\tAdapter Content\n" > "${Outputfile}"/Summary_FastQC_fail
+grep "FAIL" "${Outputfile}" | sort -u > "${Outputfile}"/Summary_FastQC_fail
