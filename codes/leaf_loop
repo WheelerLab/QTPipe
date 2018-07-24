@@ -72,12 +72,11 @@ PATH=$PATH:"${LeafcutterLoc}"/scripts
 
 #should add a check for if a particular sample has already had junction files made for it and skip it
 
-if [ -d "${OutputDirectory}" ]
+if [ ! -d "${OutputDirectory}" ]
 then 
-	rm -rf "${OutputDirectory}"
+	mkdir "${OutputDirectory}" # make a directory where the outputs will go - also update as an option
 fi 
 
-mkdir "${OutputDirectory}" # make a directory where the outputs will go - also update as an option
 cd "${OutputDirectory}"
 
 cat "${SampleList}" | while read line #iterate through the list
