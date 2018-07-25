@@ -80,9 +80,8 @@ The star loop now has a built in method to rename samples so that they match wit
 -ri or --runindexing
 >This option declares whether the user wishes to run indexing or not. This flag does not have any positional arguments .As this is a time intensive step, by default indexing will not be run.  As such this argument is explicitly **_required only when indexing has not been run._** Additionally, when supplied it is **_required that the --genomefastafiles flag is supplied as well._**
 
--s or --samplenumber)
->This option specifies the number of samples within your fastq directory you wish to run. This option is **_optional_** with a default value of 10. This option is largely provided for in lab testing of scripts. It is meant to make testing scalable for comparison of different sample sizes. The default is set at 10 since 1)This sample size allows for reasonable estimation of larger sample sizes and 2) It is low enough that if one forgets to set the sample size it will execute in a reasonable amount of time. Future implementations should expect an argument to run on the entire directory.
-
+-s or --samplelist
+>This option specifies the list of samples that you are going to process
 **features not yet implemented**
 argument to run on an entire directory  
 option for different types of star output (SAM vs BAM vs sorted vs unsorted)
