@@ -1,5 +1,6 @@
 import gzip
 import argparse as ap
+import numpy as np
 
 parser = ap.ArgumentParser()
 parser.add_argument('qqnorminput', help = 'file path of the target qqnorm file to be parsed')
@@ -11,6 +12,9 @@ with open(args.qqnorminput, 'r') as qq:
 	columns = []
 	for line in qq:
 		columns = line.split('\t')
+		if ('#Chr' not in columns):
+			if (np.var(list(map(float, columns[4:]))) <= 0.5 and np.var(list(map(float, columns[4:]))) >= -0.5):
+				continue
 		if 'ID' not in line:
 			loc_line = '\t'.join([columns[3],'chr'+columns[0],columns[1],columns[2]])
 		else:
