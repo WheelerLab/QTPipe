@@ -1,11 +1,17 @@
 
 AnnotationFileDefault=~/Data/GenCode/gencode.v28.annotation.gtf
-SampleListOutDefault=~/sample_list.txt #tricky fix this
-TranscriptFileDefault=~/Data/GenCode/gencode.v28.transcripts.fa
-GenomeFileDefault=~/Data/GenCode/GRCh38.primary_assembly.genome.fa
 BamDirectoryDefault=~/StarAlignments
 FastqDirDefault=~/Data/GenCode/gEUVADIS_RNASeq
+GenomeFileDefault=~/Data/GenCode/GRCh38.primary_assembly.genome.fa
 QuantOutputDefault=~/SalQuant
+QCoutputDefault=~
+SampleListOutDefault=~/sample_list.txt #tricky fix this
+SplicingDirectoryDefault=~/leafSplice
+TranscriptFileDefault=~/Data/GenCode/gencode.v28.transcripts.fa
+
+
+
+
 while :
 do
     case "$1" in
@@ -26,78 +32,49 @@ do
           GenomeFiles="$2"
 	  shift 2
 	  ;;
+      -id | --indexingdirectory) #when supplied alone, indexing has been run, and points to the index directory. When supplied with -ri, serves as output directory for indexing.
+	  IndexDirectory="$2"
+	  shift 2
+	  ;;
+      -lt | --librarytype) #directory containing the fastq files to be processed
+	  LibraryType="$2"  
+	  shift 2
+	  ;;
       -n | --samplenumber) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 89.
 	  SampNum="$2"
 	  shift 2
 	  ;;
-      -q | --quantoutput) #directory where you'd like to send all your quantification files
+      -q | --quantdirectory) #directory where you'd like to send all your quantification files
           QuantOutput="$2"
+	  shift 2
+	  ;;
+      -r | --runindexing) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
+	  RunIndex="$2"
 	  shift 2
 	  ;;
       -s | --samplelist) #list of all samples that will be processed
 	  SampleListOut="$2"
 	  shift 2
 	  ;;
+      -sp | --splicingdirectory) 
+	  SplicingDir="$2"
+	  shift 2
+	  ;;
       -t | --transcript)
 	  TranscriptFile="$2"
 	  shift 2
 	  ;;
-      -v | --variancethreshold) #variance threshold for eqtl analysis
-          AnnotationFile="$2"
-	  shift 2
-	  ;;
-      
-                                          #list_samples_options
-     # -i | --inputdirectory) #directory containing the sample files to be processed
-	#  SampDir="$2"  
-	 # shift 2
-	  #;;
-     # -o | --outputdirectory) #directory where you'd like to send your sample list
-      #    Output="$2"
-	#  shift 2
-	  #;;
-  #    -s | --samplenumber) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 89.
-	#  SampNum="$2"
-	 # shift 2
-	  #;;
-                                          #Star options
-      #-a | --annotation) #annotation file corresponding to the genome
-      #    AnnotationFile="$2"
-	#  shift 2
-	 # ;;
-     # -g | --genomefastafiles) #file path to the genome files for indexing. Must be supplied when -ri is supplied
-      #    GenomeFile="$2"
-	#  shift 2
-	 # ;;
-     # -i | --inputdirectory) #directory containing the fastq files to be processed
-	#  FastqDir="$2"  
-	 # shift 2
-	  #;;
-      -id | --indexingdirectory) #when supplied alone, indexing has been run, and points to the index directory. When supplied with -ri, serves as output directory for indexing.
-	  IndexDirectory="$2"
-	  shift 2
-	  ;;
-     # -o | --outputdirectory) #directory where you'd like to send all your alignments
-      #    AlignmentOut="$2"
-	#  shift 2
-	 # ;;
-      -ri | --runindexing) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
-	  RunIndex="$2"
-	  shift 2
-	  ;;
-   #   -s | --samplelist) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
-	#  SampList="$2"
-	 # shift 2
-	 # ;;
-      -t | --threads) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
+      -th | --threads) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
 	  Threads="$2"
 	  shift 2
 	  ;;
-                                                    #Leafcutter options
- #     -i | --inputdirectory) #Directory containing the star alignment files (assumes individual sample directories)
-  #    	  InputDirectory="$2"
-#	  shift 2
-#	  ;;
+      
+
+
+
+
+
+
       -l | --lengthmaximum) #maximum length of introns to be used in clustering
       	  LengthMaximum="$2"
 	  shift 2
@@ -106,7 +83,7 @@ do
       	  MinimumClustering="$2"
 	  shift 2
 	  ;;
-      -p | --prefix) #prefix of output
+      -t | --tag) #prefix of output
       	  OutputPrefix="$2"
 	  shift 2
 	  ;;
@@ -118,53 +95,12 @@ do
       	  RatioMinimum="$2"
 	  shift 2
 	  ;;
-    #  -s | --samplelist) 
-     # 	  SampleList="$2"
-	#  shift 2
-	 # ;;
-      -w | --writeto) #write leafcutter clustering to this directory
-      	  OutputDirectory="$2"
-	  shift 2
-      	  ;;
+
     
-                                                        #salmon options
-   #   -a | --annotation) #annotation file corresponding to the genome
-    #      AnnotationFile="$2"
-	#  shift 2
-	 # ;;
-   #   -i | --inputdirectory) #directory containing the bam files to be processed
-	#  InputDirectory="$2"  
-	 # shift 2
-	  ;;
-      -lt | --librarytype) #directory containing the fastq files to be processed
-	  LibraryType="$2"  
-	  shift 2
-	  ;;
-  #    -q | --quantoutput) #directory where you'd like to send all your quantification files
-   #       QuantOutputDirectory="$2"
-	#  shift 2
-	 # ;;
-    #  -s | --samplelist) 
-     # 	  SampleList="$2"
-	#  shift 2
-	 # ;;
-   #   -t | --transcript)
-#	  TranscriptFile="$2"
-#	  shift 2
-#	  ;;
-			#fastqc options
-      -f | --fastqdir) #directory containing the fastq files to be processed
-	        InputDir="$2"  
-	        shift 2
-	        ;;
-      -o | --output) #directory where you'd like to send all your quantification files
-          Outputfile="$2"
-	        shift 2
-	        ;;
-      -s | --samplelist) #a list of all the samples you're going to process
-      	  SampleList="$2"
-	        shift 2
-	        ;;
+
+
+
+
                                                       #generic options
       -*) #unknown 
 	  echo "Error: Unknown option: $1" >&2
@@ -183,23 +119,34 @@ done
 
 ~/codes/list_samples --inputdirectory "${FastqDir:=$FastqDirDefault}" --outputdirectory "${SampleListOut:=SampleListOutDefault}" --samplenumber "${SampNum:=}"
 
-~/codes/filtering/fastqc_loop --fastqdir "${FastqDir:=$FastqDirDefault}" --output "${}" --samplelist "${SampleListOut:=}"
+~/codes/filtering/fastqc_loop --fastqdir "${FastqDir:=$FastqDirDefault}" --output "${}" --samplelist "${SampleListOut:=SampleListOutDefault}"
 
-~/codes/star_loop --annotation "${AnnotationFile:=$AnnotationFileDefault}" --genomefastafiles "${GenomeFile:=$GenomeFileDefault}" --inputdirectory "${FastqDir:=$FastqDirDefault}" --indexingdirectory "${BamDirectory:=}" --outputdirectory "${}" --runindexing "${}" --samplelist "${SampleListOut:=}" --threads "${}"
+~/codes/star_loop --annotation "${AnnotationFile:=$AnnotationFileDefault}" --genomefastafiles "${GenomeFile:=$GenomeFileDefault}" --inputdirectory "${FastqDir:=$FastqDirDefault}" --indexingdirectory "${BamDirectory:=}" --outputdirectory "${}" --runindexing "${}" --samplelist "${SampleListOut:=SampleListOutDefault}" --threads "${}"
 
-~/codes/leaf_loop --inputdirectory "${BamDirectory:=$BamDirectoryDefault}" --lengthmaximum "${}" --minimumclustering "${}" --prefix "${}" --principalcomponents "${}" --ratiominimum "${}" --samplelist "${SampleListOut:=}" --writeto "${}"
+
+
+~/codes/leaf_loop --inputdirectory "${BamDirectory:=$BamDirectoryDefault}" --lengthmaximum "${}" --minimumclustering "${}" --prefix "${}" --principalcomponents "${}" --ratiominimum "${}" --samplelist "${SampleListOut:=SampleListOutDefault}" --outputdir "${}"
 for qqnorm in ${writeleaf}*qqnorm*
 do
 	python3 qqnormparser.py $qqnorm
 done
 
-~/codes/salmon_loop --annotation "${AnnotationFile:=$AnnotationFileDefault}" --inputdirectory "${BamDirectory:=$BamDirectory}" --librarytype --outputdirectory "${QuantOutput:=QuantOutputDefault}" --samplelist "${SampleListOut:=}" --transcript "${TranscriptFile:=$TranscriptFileDefault}"
-~/codes/Salmon_parser.R -o "${QuantOutput:=}"/expression_location -q "${QuantOutput:=}" -a "${AnnotationFile:=$AnnotationFileDefault}" -v "${}" -m "${}" -s "${}"
+
+
+~/codes/salmon_loop --annotation "${AnnotationFile:=$AnnotationFileDefault}" --inputdirectory "${BamDirectory:=$BamDirectory}" --librarytype --outputdirectory "${QuantOutput:=QuantOutputDefault}" --samplelist "${SampleListOut:=SampleListOutDefault}" --transcript "${TranscriptFile:=$TranscriptFileDefault}"
+~/codes/Salmon_parser.R -o "${QuantOutput:=QuantOutputDefault}"/expression_location -q "${QuantOutput:=}" -a "${AnnotationFile:=$AnnotationFileDefault}" -v "${}" -m "${}" -s "${}"
+
 
 
 SNPparser
-
-Rscript ~/codes/MatrixEQTL.R -sg "${}" -sl "${}" -ge "${}" -gl "${}"
-
-Rscript ~/codes/MatrixEQTL.R -sg "${}" -sl "${}" -ge "${}" -gl "${}"
-matrix eqtl - sqtl analysis
+echo "Beginning eQTL analysis"
+for i in 1:22
+do
+	Rscript ~/codes/MatrixEQTL.R -sg "${}" -sl "${}" -ge "${}" -gl "${}" #eqtl
+done
+echo "Beginning sQTL analysis"
+for i in 1:22
+do
+	Rscript ~/codes/MatrixEQTL.R -sg "${}" -sl "${}" -ge "${}" -gl "${}" #sqtl
+done
+echo "complete"
