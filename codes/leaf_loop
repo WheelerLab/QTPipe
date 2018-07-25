@@ -31,6 +31,10 @@ do
 	  PC="$2"
 	  shift 2
 	  ;;
+      -o | --outputdir) #write leafcutter clustering to this directory
+      	  OutputDirectory="$2"
+	  shift 2
+      	  ;;
       -r | --ratiominimum) #The minimum ratio of reads that must map to support a cluster
       	  RatioMinimum="$2"
 	  shift 2
@@ -39,10 +43,6 @@ do
       	  SampleList="$2"
 	  shift 2
 	  ;;
-      -w | --writeto) #write leafcutter clustering to this directory
-      	  OutputDirectory="$2"
-	  shift 2
-      	  ;;
       -*) #unknown 
 	  echo "Error: Unknown option: $1" >&2
 	  exit 1
