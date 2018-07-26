@@ -44,6 +44,14 @@ do
 	  SampNum="$2"
 	  shift 2
 	  ;;
+      --noteqtl)
+      --notfastqc)
+      --notleafcutter)
+      --notmatrixeqtl)
+      --notsalmon)
+      --notsqtl)
+      --notstar) 
+	  
       -q | --quantdirectory) #directory where you'd like to send all your quantification files
           QuantOutput="$2"
 	  shift 2
