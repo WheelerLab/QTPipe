@@ -6,10 +6,11 @@ parser$add_argument("-sg", "--snpgenotype", help="file path of the snp genotype 
 parser$add_argument("-sl", "--snplocation", help="fiel path of the snp locaiton file")
 parser$add_argument("-ge", "--geneexpression", help="file path of the gene expression file")
 parser$add_argument("-gl", "--genelocation", help="file path of the gene location file")
+parser$add_argument("-t", "--tag", help="file tag for this run of samples")
 args <- parser$parse_args()
 
-strip = gregexpr(pattern = 'chr', text = args$genelocation, ignore.case = T)
-CHRnum <- substr(args$genelocation, strip, nchar(args$genelocation))
+#strip = gregexpr(pattern = 'chr', text = args$genelocation, ignore.case = T)
+CHRnum <- args$tag  #substr(args$genelocation, strip, nchar(args$genelocation))
 
 useModel = modelLINEAR; # modelANOVA, modelLINEAR, or modelLINEAR_CROSS
 
