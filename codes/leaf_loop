@@ -83,12 +83,12 @@ cat "${SampleList}" | while read line #iterate through the list
 do
 	Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
 	echo Converting "${Sample}" associated Aligned.out.bam to "${Sample}.junc"
-	sh $LeafcutterLoc/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}_star"/Aligned.out.bam "${OutputDirectory}"/"${Sample}.junc"
+	sh "${LeafcutterLoc}"/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}_star"/Aligned.out.bam "${OutputDirectory}"/"${Sample}.junc"
 	echo "${Sample}.junc" >> "${OutputDirectory}"/juncfiles.txt
 done
 
 python "${LeafcutterLoc}"/clustering/leafcutter_cluster.py -j "${OutputDirectory}"/juncfiles.txt -m "${MinimumClustering}" -o "${OutputPrefix}" -l "${LengthMaximum}" -r "${OutputDirectory}" -p "${RatioMinimum}"
-zcat "${OutputDirectory}"/"${OutputPrefix}_perind.counts.gz" | grep "chr" > "${OutputDirectory}"/"${OutputPrefix}"_filtered_perind.counts #filtering step - removes unmapped loci that woukld break leafcutter
+zcat "${OutputDirectory}"/"${OutputPrefix}_perind.counts.gz" | grep "chr" | grep -v "M" > "${OutputDirectory}"/"${OutputPrefix}"_filtered_perind.counts #filtering step - removes unmapped loci that woukld break leafcutter
 gzip "${OutputPrefix}"_filtered_perind.counts
 #note this line requires full path
 /usr/local/bin/anaconda2/bin/python "${LeafcutterLoc}"/scripts/prepare_phenotype_table.py "${OutputDirectory}"/"${OutputPrefix}"_filtered_perind.counts.gz -p "${PC}"
