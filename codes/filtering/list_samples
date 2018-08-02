@@ -1,7 +1,7 @@
 SampDirDefault=~/Data/gEUVADIS_RNASeq/
 OutputDefault=~/sample_list.txt
 SampNumDefault=89
-PopulationListDefault=~/Data/SNPdata/GEU_SNPs.txt
+SNPListDefault=~/Data/SNPdata/GEU_SNPs.txt
 while :
 do
     case "$1" in
@@ -13,7 +13,7 @@ do
           Output="$2"
 	  shift 2
 	  ;;
-      -p | --populationlist) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
+      -SNP | --SNPlist) #
 	  SampNum="$2"
 	  shift 2
 	  ;;
@@ -35,7 +35,7 @@ done
 echo "generating ${Output:=$OutputDefault}"
 echo "writing ${SampNum:=$SampNumDefault} samples"
 echo "Using samples in ${SampDir:=$SampDirDefault}"
-echo "Using population list of ${PopulationList:=PopulationListDefault}"
+echo "Using population list of ${PopulationList:=$PopulationListDefault}"
 
 #create list of samples and their corresponding names
 if [ -e "${Output}" ] #remove any files with this name to start with
