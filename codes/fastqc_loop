@@ -36,7 +36,7 @@ cat "${SampleList}" | while read line #iterate through the list
 do
   Fastq=$( echo "${line}" | cut -f 2 -d$'\t' )
   Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
-	/usr/local/bin/FastQC/fastqc "${InputDir}"/"${Fastq}_1.fastq.gz" "${InputDir}"/"${Fastq}_2.fastq.gz" 
+	/usr/local/bin/FastQC/fastqc "${InputDir}"/"${Fastq}_1.fastq.gz" "${InputDir}"/""${Fastq:=$Sample}"_2.fastq.gz" 
   unzip -n "${InputDir}"/"${Fastq}_1_fastqc.zip" "${Fastq}_1_fastqc"/summary.txt -d "${InputDir}"
   ( printf "${Fastq}_1.fastq\t${Sample}\t" && cut "${InputDir}"/"${Fastq}_1_fastqc"/summary.txt -f 1 -d$'\t' | paste -s ) >> "${Outputdir}"/Summary_FastQC
   unzip -n "${InputDir}"/"${Fastq}_2_fastqc.zip" "${Fastq}_2_fastqc"/summary.txt -d "${InputDir}"
