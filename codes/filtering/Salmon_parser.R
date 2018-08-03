@@ -9,6 +9,9 @@ parser <- ArgumentParser()
 parser$add_argument("-a", "--annotation", help="file path of the annotation file")
 parser$add_argument("-q", "--quantdir", help="file path of directory containing salmon's quantification files")
 parser$add_argument("-o", "--outputdir", help="file path of the snp genotype file")
+parser$add_argument("-m", "--meanthreshold", help="threshold for mean based filtering. Fitlers out those samples with mean less than threshold", type="double", default=0.1 )
+parser$add_argument("-v", "--variancethreshold", help="threshold for variance based filtering. Fitlers out those samples with variance within the range of c(-threshold:+threshold) inclusively.", type="double", default=0.1 )
+parser$add_argument("-s", "--scaledthreshold", help="threshold for normalized variance filtering. Filters out those genes with normalized variance within the range c(-threshold:threshold) inclusive. normalization is done via the r function scale()", type="double", default=0)
 args <- parser$parse_args()
 
 
@@ -17,13 +20,18 @@ args <- parser$parse_args()
 files <- list.files(path = args$quantdir , pattern = "[0123456789]+\\.sorted\\.genes\\.quant\\.sf", recursive = T)
 sample_temp <- as.data.frame(read.table(file = paste(args$quantdir,files[1], sep=""), sep ='\t', header =T))
 TPM <- select(sample_temp, "Name")
-names <- c("gene_id", substring(files,1 ,regexpr("_", files)-1))
+names <- c("gene_id", substring(files,1 ,regexpr("_", files)-1), "mean", "var", "scaled_var")
 for (j in files){
   sample_temp <- as.data.frame(read.table(file = paste(args$quantdir,j, sep=""), sep='\t', header=T))
   TPM <- cbind(TPM, select(sample_temp, "TPM"))
 }
-
+means<-rowMeans(TPM[-1])
+variances<-apply(TPM[-1], 1, var)
+scaledvar<-scale(variances)
+TPM <-as.data.frame(cbind(TPM,means,variances,scaledvar))
+warnings()
 colnames(TPM)<-names
+TPM <- filter(TPM, (( var > args$variancethreshold | var < -args$variancethreshold) & ( scaled_var > args$scaledthreshold | scaled_var < -args$scaledthreshold )) & mean > args$meanthreshold)
 print("TPM dataframe generated")
 
 total_annotation <- as.data.frame(read.table(file = args$annotation , sep = '\t', header =F, skip = 5))
@@ -36,7 +44,7 @@ print("total annotation data frame generated")
 for (i in 1:22){
   chr_annotation <- filter(total_annotation, chr == paste("chr", i, sep=""))
   write.table(x =select(semi_join(chr_annotation, TPM, by ="gene_id"), "gene_id", "chr", "start", "stop"), file = paste(args$outputdir, "/location_sal_chr",i,sep=""), row.names = F, quote = F)#location file
-  write.table(x =arrange(semi_join(TPM, chr_annotation, by = "gene_id"), gene_id), file = paste(args$outputdir, "/expression_sal_chr",i,sep=""), row.names = F, quote = F)
+  write.table(x =arrange(semi_join(select(TPM, -mean, -var, -scaled_var), chr_annotation, by = "gene_id"), gene_id), file = paste(args$outputdir, "/expression_sal_chr",i,sep=""), row.names = F, quote = F)
   print(paste("chr",i,"processed"))
 }
 
