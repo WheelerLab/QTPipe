@@ -1,6 +1,6 @@
 #!/bin/bash
 #uncomment next line for automatic path addition
-PATH=$PATH:~/salmon/bin/
+PATH=$PATH:~/software/salmon/bin/
 
 
 LibraryTypeDefault=A
