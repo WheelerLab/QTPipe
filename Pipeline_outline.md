@@ -7,6 +7,15 @@ this document is meant to give a detailed description of this pipeline. It will 
 
 This outline is intended to be a living document, with examples and descriptions intended to be updated as the pipeline is updated. Where appropriate this outline will reference the manuals and studies that aided its development. Importantly there are many defaults and options set within this pipeline that are intended to make the lives of this lab in particular easier. Their purpose ranges from changing the number of samples for easy scalable testing to implementing defaults for quick command line runs. Where possible this document notes what is intended for in house usage and why. Individuals considering utilizing or referencing this pipeline may wish to make alterations accordingly.    
 
+## Requirements
+
+FastQC
+STAR
+Leafcutter
+Python2 & Python 3
+Salmon
+R
+
 ## Basic Flowgram
 
 1. Subset your samples (filter)
@@ -22,6 +31,55 @@ This outline is intended to be a living document, with examples and descriptions
 In general The options of this pipeline fall into two categories, shared and specific. As they may sound, shared options are those that connect the different scripts of this pipeline. These options entail both raw data and its flow from one ource to another. This includes reference files, sample data, and the inputs and outputs from one script to another. On the pipeline level, these are all meant to be set with adequate defaults so that the only information the user typically must provide is the raw input data as well as the necessary reference files. These options include all required options that the user must supply the pipeline. On the level of the individual scripts, these are options that do not have a set default (although they are set in the pipeline superscript).   The majority of options fall into this category. 
 
 In contrast are specific options which correspond to features found only in a particular script. These options include such features as deciding the minimum clustering size for leafcutter analysis or specifying what library type Salmon should use for its analysis. These arguments tend to be optional, with most if not all having defined within their own scripts a default value. They can still easily be accessed on the super script level.
+
+## Running eqtl analysis
+
+For convenience a script simply titled eqtl has been provided. This script will run FastQC, STAR, Salmon, MatrixEQTL as well as perform sample filtering on those provided. This script has several required inputs including: Annotation file (.gtf), fastq Directory, genome files (.fa), transcript file (.fa), sample list, SNP genome and location files, as well as a VCF file (these last three may be condensed in future iterations). Currently, all of these options have reasonable defaults set within the script. These defaults can be easily changed in one location simply by editing the defaults at the top of the eqtl script. Additionaly many of these files come from publicly available data sets such as GenCode. 
+
+-a | --annotationfile) 
+>path to annotation file
+
+-b | --bamdirectory) 
+>name for directory containing bamfiles. If doesn't exist and running STAR, will create directory
+
+-f | --fastqdirectory) 
+>directory containing the fastq files to be processed
+
+-fqc | --fastqcdirectory) 
+>directory where you'd like to write Summary_FastQC files
+
+-g | --genomefile) 
+>path to the genome file
+
+-id | --indexdirectory) 
+>directory containing STAR index. Will create index here if running indexing.
+
+-l | --libtype) 
+>Library type (paired end vs sigle etc.). Used by Salmon. By Default Salmon will automatically infer your lib type based on your bam files.
+
+-q | --quantdirectory) 
+>directory where quantification results will be written. If doesn't exist will create directory.
+
+-ri | --runindex) 
+>accepts T or F - would you like to run Indexing? Since Indexing is a time intensive process, by default it assumes it as already been run once
+
+-s | --samplelist) 
+>list of Fastq samples you'd like to process in the Fastqdir. See sample list format for frther details.
+
+-sg | --SNPgenotype) 
+>Path to file containing your SNP genotypes for all samples (May contain more samples than will be processed, but cannot contain less. Excess samples will simply be filtered out. homogenous genotypes will also be removed)
+
+-sl | --SNPgenotype) 
+>Path to file containing SNP Locations corresponding to SNP genotype file provided
+
+-so | --SNPout)
+>Where you'd like to write filtered SNP data
+
+-t | --transciptfile) 
+>Path to transcript file
+
+-tag)
+>How you'd like the filtered SNP data to be tagged
 
 # Individual Scripts & Their Options
 
