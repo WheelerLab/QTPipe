@@ -50,7 +50,7 @@ snps$fileSkipRows = 1; # one row of column labels
 snps$fileSkipColumns = 1; # one column of row labels
 snps$fileSliceSize = 2000; # read file in slices of 2,000 rows
 snps$LoadFile(SNP_file_name);
-
+print("gene")
 ## Load gene expression data
 gene = SlicedData$new();
 gene$fileDelimiter = ""; # the TAB character
@@ -71,7 +71,9 @@ if(length(covariates_file_name)>0) {
 }
 
 ## Run the analysis
+print("SNP")
 snpspos = read.table(snps_location_file_name, header = TRUE, stringsAsFactors = FALSE);
+print("gene")
 genepos = read.csv(gene_location_file_name, header = TRUE, sep='', stringsAsFactors = FALSE);
 me = Matrix_eQTL_main(
   snps = snps,
