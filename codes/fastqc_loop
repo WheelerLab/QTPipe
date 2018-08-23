@@ -30,6 +30,11 @@ echo "Fastq directory is ${InputDir:?not set}"
 echo "Sample List is ${SampleList:?not set}"
 echo "Sending output to ${Outputdir:=$OutputdirDefault}"
 
+if [ ! -d "${Outputdir}" ]
+then
+	mkdir "${Outputdir}"
+fi
+
 printf "Fastq tag\tSample\tBasic Statistics\tPer base sequence quality\tPer tile sequence quality\tPer sequence quality scores\tPer base sequence content\tPer sequence GC content\tPer base N content\tSequence Length Distribution\tSequence Duplication Levels\tOverrepresented sequences\tAdapter Content\n" > "${Outputfile}"/Summary_FastQC
 
 cat "${SampleList}" | while read line #iterate through the list
