@@ -103,7 +103,7 @@ do
 done
 
 #list samples three options -i fastqdir -o write directory -s sample size
-codes/filtering/list_samples -i "${FastqDir:=FastqDirDefault}" -o "${SampleList:=SampleListOutDefault}" -s "${SampleNumber:=SampleListOutDefault}" -SNP "${SNPGenotypeFile:=SNPGenotypeFileDefault}"
+RNA-Seq_Pipeline_Project/codes/filtering/list_samples -i "${FastqDir:=FastqDirDefault}" -o "${SampleList:=SampleListOutDefault}" -s "${SampleNumber:=SampleListOutDefault}" -SNP "${SNPGenotypeFile:=SNPGenotypeFileDefault}"
 echo "Beginning FastQC"
 RNA-Seq_Pipeline_Project/codes/fastqc_loop -f "${FastqDir:=$FastqDirDefault}" -o "${FastQCDir:=$FastQCDirDefault}" -s "${SampleList:=$SampleListDefault}"
 echo "Finished FastQC"
