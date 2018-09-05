@@ -8,6 +8,7 @@ GenomeFileDefault=~/Data/GenCode/GRCh38.primary_assembly.genome.fa
 MeanThresholdDefault=0.1
 QuantDirectoryDefault=~/testruns/SalQuant/
 SampleListDefault=~/sample_list.txt
+SampleNumberDefault=10
 SNPGenotypeFileDefault=~/testSNPgenotype.txt
 SNPLocationFileDefault=~/testSNPlocation.txt
 SNPOutDefault=~/Data/SNPdata
@@ -49,6 +50,10 @@ do
          	;;
       -m | --meanthreshold)
 		MeanThreshold="$2"
+		shift 2
+		;;
+      -n | --samplenumber)
+		SampleNumber="$2"
 		shift 2
 		;;
       -q | --quantdirectory) #directory where quantification results will be written. If doesn't exist will create directory.
@@ -103,7 +108,8 @@ do
 done
 
 #list samples three options -i fastqdir -o write directory -s sample size
-codes/filtering/list_samples -i "${FastqDir:=FastqDirDefault}" -o "${SampleList:=SampleListOutDefault}" -s "${SampleNumber:=SampleListOutDefault}" -SNP "${SNPGenotypeFile:=SNPGenotypeFileDefault}"
+
+RNA-Seq_Pipeline_Project/codes/filtering/list_samples -i "${FastqDir:=FastqDirDefault}" -o "${SampleList:=SampleListDefault}" -s "${SampleNumber:=SampleNumberDefault}" -SNP "${SNPGenotypeFile:=SNPGenotypeFileDefault}"
 echo "Beginning FastQC"
 RNA-Seq_Pipeline_Project/codes/fastqc_loop -f "${FastqDir:=$FastqDirDefault}" -o "${FastQCDir:=$FastQCDirDefault}" -s "${SampleList:=$SampleListDefault}"
 echo "Finished FastQC"
