@@ -24,7 +24,7 @@ do
 	  FastqDir="$2"  
 	  shift 2
 	  ;;
-      -id | --indexingdirectory) #when supplied alone, indexing has been run, and points to the index directory. When supplied with -ri, serves as output directory for indexing.
+      --indexdir) #when supplied alone, indexing has been run, and points to the index directory. When supplied with -ri, serves as output directory for indexing.
 	  IndexDirectory="$2"
 	  shift 2
 	  ;;
@@ -32,9 +32,9 @@ do
           AlignmentOut="$2"
 	  shift 2
 	  ;;
-      -ri | --runindexing) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
-	  RunIndex="$2"
-	  shift 2
+      -r | --runindexing) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
+	  RunIndex=T
+	  shift 1
 	  ;;
       -s | --samplelist) #list of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
 	  SampleList="$2"
@@ -125,13 +125,14 @@ then
 fi
 cat "${SampleList}" | while read line #iterate through the list
 do
-	Fastq=$( echo "${line}" | cut -f 2 -d$'\t' )
-	Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
+	Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
+	temp=$( echo "${line}" | cut -f 2 -d$'\t' )
+	Sample="${Fastq:=$temp}"
 	if [ -d "${AlignmentOut}"/"${Sample}_star" ] 
 	then
 		rm -rf "${AlignmentOut}"/"${Sample}_star" #remove any folders that might have this name
 	fi
 	mkdir "${AlignmentOut}"/"${Sample}_star" #make the directory
 	cd "${AlignmentOut}"/"${Sample}_star" #go to that directory
-	/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}"*.gz --readFilesCommand zcat --waspOutputMode SAMtag --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}" --varVCFfile <(zcat "${VCFfile}") --outSAMattributes vW
+	/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}"*.fastq.gz.gz --readFilesCommand zcat --waspOutputMode SAMtag --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}" --varVCFfile <(zcat "${VCFfile}") --outSAMattributes vW
 done
