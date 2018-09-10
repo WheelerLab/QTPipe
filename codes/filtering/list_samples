@@ -1,7 +1,10 @@
+#!/bin/bash
+
 SampDirDefault=~/Data/gEUVADIS_RNASeq/
 OutputDefault=~/sample_list.txt
 SampNumDefault=89
 SNPListDefault=~/Data/SNPdata/GEU_SNPs.txt
+
 while :
 do
     case "$1" in
@@ -11,10 +14,6 @@ do
 	  ;;
       -o | --outputdirectory) #directory where you'd like to send all your alignments
           Output="$2"
-	  shift 2
-	  ;;
-      -SNP | --SNPlist) #
-	  SampNum="$2"
 	  shift 2
 	  ;;
       -s | --samplenumber) #number of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
