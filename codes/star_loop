@@ -134,5 +134,5 @@ do
 	fi
 	mkdir "${AlignmentOut}"/"${Sample}_star" #make the directory
 	cd "${AlignmentOut}"/"${Sample}_star" #go to that directory
-	/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}"*.fastq.gz.gz --readFilesCommand zcat --waspOutputMode SAMtag --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}" --varVCFfile <(zcat "${VCFfile}") --outSAMattributes vW
+	/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}"*.fastq.gz --readFilesCommand zcat --waspOutputMode SAMtag --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}" --varVCFfile <(zcat "${VCFfile}") --outSAMattributes vW
 done
