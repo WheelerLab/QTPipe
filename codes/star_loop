@@ -102,7 +102,9 @@ then
 fi
 if [ "${RunWASP}" = "True" ] && [ ! -e "${VCFfile}" ] || [ "${RunWASP}" = "True" ] && [ -z "${VCFfile}" ]
 then
-	echo "Warning: Attempting to run WASP but VCF file unset or DNE" 	
+	echo "Warning: Attempting to run WASP but VCF file unset or DNE. Please supply a valid VCF file with --VCF" 
+	echo "Exiting."
+	exit 1
 fi
 
 #run index or not
