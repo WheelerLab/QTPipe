@@ -1,11 +1,10 @@
 #!/bin/bash
 #uncomment next line for automatic path addition
 PATH=$PATH:~/software/salmon/bin/
-
-
 LibraryTypeDefault=A
+MeanThresholdDefault=0.1
 OutputDirectoryDefault=~/SalQuant
-
+VarianceThresholdDefault=0.1
 while :
 do
     case "$1" in
@@ -25,6 +24,10 @@ do
 	  LibraryType="$2"  
 	  shift 2
 	  ;;
+      -m | --meanthreshold) #directory containing the fastq files to be processed
+	  MeanThreshold="$2"  
+	  shift 2
+	  ;;
       -o | --outputdirectory) #directory where you'd like to send all your quantification files
           OutputDirectory="$2"
 	  shift 2
@@ -35,6 +38,10 @@ do
 	  ;;
       -t | --transcript)
 	  TranscriptFile="$2"
+	  shift 2
+	  ;;
+      -v | --variancethreshold) #directory containing the fastq files to be processed
+	  VarianceThreshold="$2"  
 	  shift 2
 	  ;;
       -*) #unknown 
@@ -104,3 +111,5 @@ then
 		( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
 	done
 fi
+
+Rscript ../filtering/Salmon_parser.R -a "${AnnotationFile}" -q "${OutputDirectory}" -m "${MeanThreshold:=$MeanThresholdDefault}" -v "${VarianceThreshold:=$VarianceThresholdDefault}" -o ${OutputDirectory}"
