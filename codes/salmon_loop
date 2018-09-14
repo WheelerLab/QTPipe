@@ -92,6 +92,11 @@ then
 	mkdir "${OutputDirectory}"	
 fi
 
+if [ ! -d "${OutputDirectory}"/total_population ]
+then
+	mkdir "${OutputDirectory}"/total_population	
+fi
+
 if [ ! -d "${OutputDirectory}"/expression_location ]
 then
 	mkdir "${OutputDirectory}"/expression_location
@@ -112,4 +117,4 @@ then
 	done
 fi
 
-Rscript ../filtering/Salmon_parser.R -a "${AnnotationFile}" -q "${OutputDirectory}" -m "${MeanThreshold:=$MeanThresholdDefault}" -v "${VarianceThreshold:=$VarianceThresholdDefault}" -o ${OutputDirectory}"
+Rscript ../filtering/Salmon_parser.R -a "${AnnotationFile}" -q "${OutputDirectory}" -m "${MeanThreshold:=$MeanThresholdDefault}" -v "${VarianceThreshold:=$VarianceThresholdDefault}" -o ${OutputDirectory}"/total_population
