@@ -1,8 +1,0 @@
-#!/bin/bash
-set -e
-qqdir=$1
-
-for qqnorm in "${qqdir}"*qqnorm*
-do
-	/usr/local/bin/anaconda3/bin/python3 qqnormparser.py $qqnorm
-done

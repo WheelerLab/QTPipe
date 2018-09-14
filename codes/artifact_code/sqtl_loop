@@ -1,8 +1,0 @@
-#!/bin/bash
-
-
-
-for num in $( seq 22 )
-do
-	Rscript matrix_eQTL.R ~/test_runs/matrixEQTL_test/ filtered_SNP_genotype_chr"${num}".txt SNP_Location_chr"${num}".txt filtered_Gene_expression_chr"${num}" Gene_location_chr"${num}"
-done
