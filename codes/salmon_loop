@@ -13,8 +13,12 @@ do
           AnnotationFile="$2"
 	  shift 2
 	  ;;
-      -i | --inputdirectory) #directory containing the bam files to be processed
-	  InputDirectory="$2"  
+      -b | --bamdirectory) #directory containing the bam files to be processed
+	  BamDirectory="$2"  
+	  shift 2
+	  ;;
+      -f | --fastqdirectory) #directory containing the bam files to be processed
+	  FastqDirectory="$2"  
 	  shift 2
 	  ;;
       -l | --librarytype) #directory containing the fastq files to be processed
@@ -46,27 +50,57 @@ done
 
 echo "Annotation file is ${AnnotationFile:?not set}"
 echo "Using transcript file ${TranscriptFile:?not set}"
-echo "Using input bam files located in ${InputDirectory:?not set}"
-echo "Using sample list ${SampleList:?not set}"
+echo "Using sample list ${SampleList:?not set, please provide sample list}"
 echo "Writing output to ${OutputDirectory:=$OutputDirectoryDefault}"
 echo "Using library type of ${LibraryType:=$LibraryTypeDefault}"
+if [ -z "${BamDirectory}" ] && [ -z "${FastqDirectory}" ]
+then
+	echo "No target files provided. Please provide directory containing either BAM or Fastq files"
+	echo "Exiting"
+	exit 1
+fi
+if [ -n "${BamDirectory}" ] && [ ! -d "${BamDirectory}" ]
+then
+	echo "Bam directory does not exits. please provide a valid bam directory with -b or --bamdirectory option"
+	echo "Exiting"
+	exit 1
+fi
+
+if [ -n "${FastqDirectory}" ] && [ ! -d "${FastqDirectory}" ]
+then
+	echo "Fastq directory does not exits. please provide a valid Fastq directory with -f or --fastqdirectory option"
+	echo "Exiting"
+	exit 1
+fi
+
+if [ -n "${BamDirectory}" ] && [ -n "${FastqDirectory}" ]
+then
+	echo "Cannot handle both Fastq and Bam quantification at once. Please provide only one"
+	echo "Exiting"
+	exit 1
+fi
 
 if [ ! -d "${OutputDirectory}" ]
 then
 	mkdir "${OutputDirectory}"	
 fi
+
 if [ ! -d "${OutputDirectory}"/expression_location ]
 then
 	mkdir "${OutputDirectory}"/expression_location
 fi
-cat "${SampleList}" | while read line #iterate through the list
-do 
-	Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
-	if [ -d "${OutputDirectory}"/"${Sample}_salmon" ] #temporary fix - should be altered to output path in later runs
-	then
-		rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
-	fi
-	salmon quant -t "${TranscriptFile}" -l "${LibraryType}" -a  "${InputDirectory}"/"${Sample}_star"/Aligned.toTranscriptome.out.bam -o "${OutputDirectory}"/"${Sample}_salmon" --gencode -g "${AnnotationFile}"
-	( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
-done
 
+
+if [ -n "${BamDirectory}" ]
+then
+	cat "${SampleList}" | while read line #iterate through the list
+	do 
+		Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
+		if [ -d "${OutputDirectory}"/"${Sample}_salmon" ] #temporary fix - should be altered to output path in later runs
+		then
+			rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
+		fi
+		salmon quant -t "${TranscriptFile}" -l "${LibraryType}" -a  "${BamDirectory}"/"${Sample}_star"/Aligned.toTranscriptome.out.bam -o "${OutputDirectory}"/"${Sample}_salmon" --gencode -g "${AnnotationFile}"
+		( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
+	done
+fi
