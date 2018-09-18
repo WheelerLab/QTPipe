@@ -1,9 +1,12 @@
 #!/bin/bash
 #uncomment next line for automatic path addition
 PATH=$PATH:~/software/salmon/bin/
+
+IndexDirectoryDefault=~/SalmonIndex/
 LibraryTypeDefault=A
 MeanThresholdDefault=0.1
 OutputDirectoryDefault=~/SalQuant
+RunIndexDefault=False
 VarianceThresholdDefault=0.1
 while :
 do
@@ -20,6 +23,10 @@ do
 	  FastqDirectory="$2"  
 	  shift 2
 	  ;;
+      --indexdir) #when supplied alone, indexing has been run, and points to the index directory. When supplied with -ri, serves as output directory for indexing.
+	  IndexDirectory="$2"
+	  shift 2
+	  ;;
       -l | --librarytype) #directory containing the fastq files to be processed
 	  LibraryType="$2"  
 	  shift 2
@@ -31,6 +38,10 @@ do
       -o | --outputdirectory) #directory where you'd like to send all your quantification files
           OutputDirectory="$2"
 	  shift 2
+	  ;;
+      --runindex) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
+	  RunIndex=T
+	  shift 1
 	  ;;
       -s | --samplelist) 
       	  SampleList="$2"
@@ -97,14 +108,10 @@ then
 	mkdir "${OutputDirectory}"/total_population	
 fi
 
-if [ ! -d "${OutputDirectory}"/expression_location ]
-then
-	mkdir "${OutputDirectory}"/expression_location
-fi
-
 
 if [ -n "${BamDirectory}" ]
 then
+	echo "Performing alignment based quantification"
 	cat "${SampleList}" | while read line #iterate through the list
 	do 
 		Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
@@ -115,6 +122,47 @@ then
 		salmon quant -t "${TranscriptFile}" -l "${LibraryType}" -a  "${BamDirectory}"/"${Sample}_star"/Aligned.toTranscriptome.out.bam -o "${OutputDirectory}"/"${Sample}_salmon" --gencode -g "${AnnotationFile}"
 		( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
 	done
+elif [ -n "${FastqDirectory}" ]
+then
+	echo "Performing Pseudoalignment based quantification, for paired end"
+	#run index or not
+	case "${RunIndex}" in 
+		False | F)
+			if [ ! -d "${IndexDirectory}" ] #check: if not running indexing, then index must exist
+			then
+				echo "Warning: Indexing files not supplied and indexing not being run"
+				echo "Please either provide indexing files or run indexing with --runindex"
+				echo "Exiting"
+				exit 1
+			fi
+			;;
+		True | T)
+			if [ -z "${TranscriptFile}" ] #check: if running indexing, genome files must be provided
+			then
+				echo "Warning: Indexing being run without transcript files"
+				echo "Please supply transcript files with -t argument"
+				echo "Exiting"
+				exit 1
+			fi
+			if [ ! -d "${IndexDirectory}" ]  #should seriously consider a warning for if this directory already exists
+			then
+				mkdir "${IndexDirectory}"
+			fi
+			salmon index -t "${TranscriptFile}" -i "${IndexDirectory}" --type quasi 
+			#STAR --runMode genomeGenerate --genomeDir "${IndexDirectory}" --genomeFastaFiles "${GenomeFiles}" --runThreadN "${Threads}"
+			;;
+	esac
+	
+	cat "${SampleList}" | while read line #iterate through the list
+	do 
+		Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
+		if [ -d "${OutputDirectory}"/"${Sample}_salmon" ] #temporary fix - should be altered to output path in later runs
+		then
+			rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
+		fi
+		salmon quant -i "${IndexDirectory}" -l "${LibraryType}" -1 "${FastqDirectory}"/"${Sample}_1.fastq.gz" -2 "${FastqDirectory}"/"${Sample}_2.fastq.gz" -o "${OutputDirectory}" --gencode -g "${AnnotationFile}"
+		( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
+
 fi
 
 Rscript ../filtering/Salmon_parser.R -a "${AnnotationFile}" -q "${OutputDirectory}" -m "${MeanThreshold:=$MeanThresholdDefault}" -v "${VarianceThreshold:=$VarianceThresholdDefault}" -o ${OutputDirectory}"/total_population
