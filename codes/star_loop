@@ -76,7 +76,7 @@ echo "Running WASP is ${RunWASP:=$RunWASPDefault}"
 if [ "${RunWASP}" = "True" ]
 then
 	echo "Using VCF file ${VCFfile:=$VCFfileDefault}"
-done
+fi
 echo "Running indexing: ${RunIndex:=$RunIndexDefault}"
 echo "using indexing output of ${IndexDirectory:=$IndexDirectoryDefault}"
 echo "sending output to ${AlignmentOut:=$AlignmentOutDefault}"
