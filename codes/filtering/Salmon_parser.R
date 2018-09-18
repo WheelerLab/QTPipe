@@ -35,7 +35,8 @@ TPM <- filter(TPM, (( var > args$variancethreshold | var < -args$variancethresho
 print("TPM dataframe generated")
 
 total_annotation <- as.data.frame(read.table(file = args$annotation , sep = '\t', header =F, skip = 5))
-colnames(total_annotation) <- c("chr", "source", "feature-type", "start", "stop", "score", "strand", "phase", "metadata")
+colnames(total_annotation) <- c("chr", "source", "feature_type", "start", "stop", "score", "strand", "phase", "metadata")
+total_annotation<-filter(total_annotation, feature_type == "gene")
 total_annotation<-tidyr::separate(total_annotation, metadata, c("gene_id", "transcript_id"), sep = ";", extra = "drop")
 total_annotation$gene_id <- gsub("gene_id\\s(.*)", "\\1", total_annotation$gene_id)
 total_annotation$transcript_id <- gsub("transcript_id\\s*(.*)", "\\1", total_annotation$transcript_id)
