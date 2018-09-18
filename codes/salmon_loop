@@ -160,7 +160,7 @@ then
 		then
 			rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
 		fi
-		salmon quant -i "${IndexDirectory}" -l "${LibraryType}" -1 "${FastqDirectory}"/"${Sample}_1.fastq.gz" -2 "${FastqDirectory}"/"${Sample}_2.fastq.gz" -o "${OutputDirectory}" --gencode -g "${AnnotationFile}"
+		salmon quant -i "${IndexDirectory}" -l "${LibraryType}" -1 "${FastqDirectory}"/"${Sample}_1.fastq.gz" -2 "${FastqDirectory}"/"${Sample}_2.fastq.gz" -o "${OutputDirectory}"/"${Sample}_salmon" --gencode -g "${AnnotationFile}"
 		( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
 	done
 fi
