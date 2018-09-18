@@ -148,7 +148,7 @@ then
 			then
 				mkdir "${IndexDirectory}"
 			fi
-			salmon index -t "${TranscriptFile}" -i "${IndexDirectory}" --type quasi 
+			salmon index -t "${TranscriptFile}" -i "${IndexDirectory}" --type quasi --gencode
 			#STAR --runMode genomeGenerate --genomeDir "${IndexDirectory}" --genomeFastaFiles "${GenomeFiles}" --runThreadN "${Threads}"
 			;;
 	esac
