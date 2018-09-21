@@ -144,7 +144,7 @@ cat "${SampleList}" | while read line #iterate through the list
 do
 	Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
 	temp=$( echo "${line}" | cut -f 2 -d$'\t' )
-	Sample="${Fastq:=$temp}"
+	Sample="${temp:=$Fastq}"
 	if [ ! -d "${AlignmentOut}"/"${Sample}_star" ] 
 	then
 		mkdir "${AlignmentOut}"/"${Sample}_star" #make the directory
