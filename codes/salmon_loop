@@ -114,7 +114,9 @@ then
 	echo "Performing alignment based quantification"
 	cat "${SampleList}" | while read line #iterate through the list
 	do 
-		Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
+		Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
+		temp=$( echo "${line}" | cut -f 2 -d$'\t' )
+		Sample="${temp:=$Fastq}"
 		if [ -d "${OutputDirectory}"/"${Sample}_salmon" ] #temporary fix - should be altered to output path in later runs
 		then
 			rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
@@ -155,7 +157,9 @@ then
 	
 	cat "${SampleList}" | while read line #iterate through the list
 	do 
-		Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
+		Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
+		temp=$( echo "${line}" | cut -f 2 -d$'\t' )
+		Sample="${temp:=$Fastq}"
 		if [ -d "${OutputDirectory}"/"${Sample}_salmon" ] #temporary fix - should be altered to output path in later runs
 		then
 			rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
