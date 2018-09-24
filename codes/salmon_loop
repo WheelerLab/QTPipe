@@ -131,7 +131,7 @@ then
 	done
 elif [ -n "${FastqDirectory}" ]
 then
-	echo "Performing Pseudoalignment based quantification, for paired end"
+	echo "Performing Pseudoalignment based quantification"
 	#run index or not
 	case "${RunIndex}" in 
 		False | F)
