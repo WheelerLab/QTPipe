@@ -8,6 +8,7 @@ MeanThresholdDefault=0.1
 OutputDirectoryDefault=~/SalQuant
 RunIndexDefault=False
 VarianceThresholdDefault=0.1
+SingleEnd=False
 while :
 do
     case "$1" in
@@ -46,6 +47,10 @@ do
       -s | --samplelist) 
       	  SampleList="$2"
 	  shift 2
+	  ;;
+      --single-end) 
+      	  SingleEnd=True
+	  shift 1
 	  ;;
       -t | --transcript)
 	  TranscriptFile="$2"
@@ -154,19 +159,36 @@ then
 			#STAR --runMode genomeGenerate --genomeDir "${IndexDirectory}" --genomeFastaFiles "${GenomeFiles}" --runThreadN "${Threads}"
 			;;
 	esac
-	
-	cat "${SampleList}" | while read line #iterate through the list
-	do 
-		Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
-		temp=$( echo "${line}" | cut -f 2 -d$'\t' )
-		Sample="${temp:=$Fastq}"
-		if [ -d "${OutputDirectory}"/"${Sample}_salmon" ] #temporary fix - should be altered to output path in later runs
-		then
-			rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
-		fi
-		salmon quant -i "${IndexDirectory}" -l "${LibraryType}" -1 "${FastqDirectory}"/"${Sample}_1.fastq.gz" -2 "${FastqDirectory}"/"${Sample}_2.fastq.gz" -o "${OutputDirectory}"/"${Sample}_salmon" -g "${AnnotationFile}"
-		( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
-	done
+	if [ "${SingleEnd}" = "False" ] 
+	then
+		cat "${SampleList}" | while read line #iterate through the list
+		do 
+			Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
+			temp=$( echo "${line}" | cut -f 2 -d$'\t' )
+			Sample="${temp:=$Fastq}"
+			if [ -d "${OutputDirectory}"/"${Sample}_salmon" ] #temporary fix - should be altered to output path in later runs
+			then
+				rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
+			fi
+			salmon quant -i "${IndexDirectory}" -l "${LibraryType}" -1 "${FastqDirectory}"/"${Sample}_1.fastq.gz" -2 "${FastqDirectory}"/"${Sample}_2.fastq.gz" -o "${OutputDirectory}"/"${Sample}_salmon" -g "${AnnotationFile}"
+			( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
+		done
+	fi
+	if [ "${SingleEnd}" = "True" ] 
+	then
+		cat "${SampleList}" | while read line #iterate through the list
+		do 
+			Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
+			temp=$( echo "${line}" | cut -f 2 -d$'\t' )
+			Sample="${temp:=$Fastq}"
+			if [ -d "${OutputDirectory}"/"${Sample}_salmon" ] #temporary fix - should be altered to output path in later runs
+			then
+				rm -rf "${OutputDirectory}"/"${Sample}_salmon" #remove any folders that might have this name
+			fi
+			salmon quant -i "${IndexDirectory}" -l "${LibraryType}" -r "${FastqDirectory}"/"${Sample}"*.fastq.gz -o "${OutputDirectory}"/"${Sample}_salmon" -g "${AnnotationFile}"
+			( head -n 1 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf && tail -n +2 "${OutputDirectory}"/"${Sample}_salmon"/quant.genes.sf | sort -k 1) > "${OutputDirectory}"/"${Sample}_salmon"/"${Sample}.sorted.genes.quant.sf"
+		done
+	fi
 fi
 
 Rscript ~/Rscript RNA-Seq_Pipeline_Project/codes/filtering/Salmon_parser.R -a "${AnnotationFile}" -q "${OutputDirectory}" -m "${MeanThreshold:=$MeanThresholdDefault}" -v "${VarianceThreshold:=$VarianceThresholdDefault}" -o "${OutputDirectory}"/total_population
