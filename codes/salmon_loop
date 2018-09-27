@@ -191,4 +191,4 @@ then
 	fi
 fi
 
-Rscript ~/Rscript RNA-Seq_Pipeline_Project/codes/filtering/Salmon_parser.R -a "${AnnotationFile}" -q "${OutputDirectory}" -m "${MeanThreshold:=$MeanThresholdDefault}" -v "${VarianceThreshold:=$VarianceThresholdDefault}" -o "${OutputDirectory}"/total_population
+Rscript RNA-Seq_Pipeline_Project/codes/filtering/Salmon_parser.R -a "${AnnotationFile}" -q "${OutputDirectory}" -m "${MeanThreshold:=$MeanThresholdDefault}" -v "${VarianceThreshold:=$VarianceThresholdDefault}" -o "${OutputDirectory}"/total_population
