@@ -1,12 +1,3 @@
-# RNA-Seq_Pipeline_Project
-Build an RNA-Seq processing pipeline that converts sequencing reads to RNA levels for downstream applications
-
-**Proposed Softwares**  
-* STAR
-* Kallisto
-* trimmomatic
-* RNA-SEQC
-
-**Test Data**
-* 1000 Genomes project
-* GENCODE project
+## About
+The purpose of this pipeline is to aid in the analysis of QTLs in the context of RNA-seq studies. Many softwares of relatively lightweight exist for this purpose, however, the majority are highly specialized to one particular task and many have outputs not suited for immediate use. While it is relatively trivial to run, parse and pipe the outputs of one software to another, it is similarly tedious to do so, especially in data sets of high volume. As such this pipeline consists of a handful of scripts, the purposes of which are to 1) loop software analysis over a large number of subjects and 2) to appropriately parse the outputs of one software for use in another. The flow of analysis is highly predictable, with a moderate level of flexibility for user preferences.
+[Please see the repository wiki for complete documentation](https://github.com/WheelerLab/QTPipe/wiki)
