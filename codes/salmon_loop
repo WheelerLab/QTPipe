@@ -1,6 +1,6 @@
 #!/bin/bash
 #uncomment next line for automatic path addition
-PATH=$PATH:~/software/salmon/bin/
+PATH=$PATH:/home/ryan/software/salmon/bin/
 
 IndexDirectoryDefault=~/SalmonIndex/
 LibraryTypeDefault=A
