@@ -18,11 +18,11 @@ args <- parser$parse_args()
 #this chunk can be made more efficient
 #also keep track of directories - these will be inputs for optparse
 files <- list.files(path = args$quantdir , pattern = "[0123456789]+\\.sorted\\.genes\\.quant\\.sf", recursive = T)
-sample_temp <- as.data.frame(read.table(file = paste(args$quantdir,files[1], sep=""), sep ='\t', header =T))
+sample_temp <- as.data.frame(read.table(file = paste(args$quantdir,"/",files[1], sep=""), sep ='\t', header =T))
 TPM <- select(sample_temp, "Name")
 names <- c("gene_id", substring(files,1 ,regexpr("_", files)-1), "mean", "var", "scaled_var")
 for (j in files){
-  sample_temp <- as.data.frame(read.table(file = paste(args$quantdir,j, sep=""), sep='\t', header=T))
+  sample_temp <- as.data.frame(read.table(file = paste(args$quantdir,"/",j, sep=""), sep='\t', header=T))
   TPM <- cbind(TPM, select(sample_temp, "TPM"))
 }
 means<-rowMeans(TPM[-1])
