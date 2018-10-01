@@ -3,10 +3,15 @@ library(argparse)
 suppressPackageStartupMessages(library(MatrixEQTL))
 parser <- ArgumentParser()
 parser$add_argument("-sg", "--snpgenotype", help="file path of the snp genotype file")
-parser$add_argument("-sl", "--snplocation", help="fiel path of the snp locaiton file")
+parser$add_argument("-sl", "--snplocation", help="file path of the snp locaiton file")
 parser$add_argument("-ge", "--geneexpression", help="file path of the gene expression file")
 parser$add_argument("-gl", "--genelocation", help="file path of the gene location file")
 parser$add_argument("-t", "--tag", help="file tag for this run of samples")
+parser$add_argument("-o", "--outputdir", help="file tag for this run of samples", type="character", default="./")
+parser$add_argument("--cis", help="threshold for writing cis snp significance", type="double", default=2e-2)
+parser$add_argument("--trans", help="threshold for writing trans snp significance", type="double", default=1e-2)
+parser$add_argument("--window", help="maximum distance between snps to be considered cis", type="double", default=1e6)
+
 args <- parser$parse_args()
 
 #strip = gregexpr(pattern = 'chr', text = args$genelocation, ignore.case = T)
@@ -31,8 +36,8 @@ output_file_name_cis = tempfile();
 output_file_name_tra = tempfile();
 
 # Only associations significant at this level will be saved
-pvOutputThreshold_cis = 2e-2;
-pvOutputThreshold_tra = 1e-2;
+pvOutputThreshold_cis = args$cis;
+pvOutputThreshold_tra = args$trans;
 
 # Error covariance matrix
 # Set to numeric() for identity.
@@ -40,12 +45,12 @@ errorCovariance = numeric();
 # errorCovariance = read.table("Sample_Data/errorCovariance.txt");
 
 # Distance for local gene-SNP pairs
-cisDist = 1e6;
+cisDist = args$window;
 
 ## Load genotype data
 snps = SlicedData$new();
 snps$fileDelimiter = ""; # the TAB character
-snps$fileOmitCharacters = "NA"; # denote missing values;
+snps$fileOmitCharacters = "-1"; # denote missing values;
 snps$fileSkipRows = 1; # one row of column labels
 snps$fileSkipColumns = 1; # one column of row labels
 snps$fileSliceSize = 2000; # read file in slices of 2,000 rows
@@ -97,18 +102,18 @@ unlink(output_file_name_cis);
 library(data.table)
 
 ## Results:
-CisOutput<- paste("./cis_eQTLs_", CHRnum, ".txt", sep = "")
+CisOutput<- paste(args$outputdir, "/cis_eQTLs_", CHRnum, ".txt", sep = "")
 cat('Analysis done in: ', me$time.in.sec, ' seconds', '\n');
 cat('Detected local eQTLs:', '\n');
 fwrite(me$cis$eqtls, CisOutput, sep = '\t')
 
-TransOutput <- paste("./trans_eQTLs_", CHRnum, ".txt", sep = "") #must hardcode output path for this to work
+TransOutput <- paste(args$outputdir, "/trans_eQTLs_", CHRnum, ".txt", sep = "") #must hardcode output path for this to work
 cat('Analysis done in: ', me$time.in.sec, ' seconds', '\n');
 cat('Detected distant eQTLs:', '\n');
 fwrite(me$trans$eqtls, TransOutput, sep = '\t')
 
 ## Malske the histogram of local and distant p-values
-PlotOutput = paste("./Cis_trans_hist_", CHRnum, ".pdf", sep = "") #must hardcode path here as well
+PlotOutput = paste(args$outputdir, "/Cis_trans_hist_", CHRnum, ".pdf", sep = "") #must hardcode path here as well
 pdf(PlotOutput)
 plot(me)
 dev.off()
