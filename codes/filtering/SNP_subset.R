@@ -14,10 +14,11 @@ SNP_genotype<-as.data.frame(read.table(file = args$snpgenotype, sep='', header =
 print("loaded SNP data")
 refnames <- colnames(SNP_genotype)
 samplelist<-as.data.frame(read.table(file = args$samplelist, sep='\t', header = F))
-sampnames<-samplelist[,1]
+sampnames<--make.names(samplelist[,1])
 sampsubset<-base::intersect(refnames, sampnames)
 samp_genotype<-select(SNP_genotype, "id", sampsubset)
-samp_genotype<-samp_genotype[rowMeans(samp_genotype[-1]) != 0 
+samp_genotype<-samp_genotype[rowMeans(samp_genotype[-1]) != -1 
+                           & rowMeans(samp_genotype[-1]) != 0 
                            & rowMeans(samp_genotype[-1]) != 1
                            & rowMeans(samp_genotype[-1]) != 2, ]
 print("finished subsetting")
