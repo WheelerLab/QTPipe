@@ -25,4 +25,4 @@ print("finished subsetting")
 SNP_location<-as.data.frame(read.table(file = args$snplocation, sep='', header = T))
 write.table(x = semi_join(samp_genotype, SNP_location, by = c("id" = "snp")), file = paste(args$outputdir,"/",args$tag, "SNPgenotype.txt", sep = ''), row.names = F, quote = F)
 write.table(x = semi_join(SNP_location, samp_genotype, by = c("snp" = "id")), file = paste(args$outputdir,"/",args$tag, "SNPlocation.txt", sep = ''), row.names = F, quote = F)
-
+write.table(x=sampsubset, file = paste(args$outputdir,"/","Genotyped_subset.txt", sep = ''), row.names = F, quote = F)
