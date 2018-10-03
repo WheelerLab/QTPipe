@@ -15,4 +15,4 @@ if (ncol(sample_list) == 2){
 } else {
   filtered_list <- filter(sample_list,V1 %in% population_list) #remove any samples that are not in the population pool of our snps
 }
-write.table(x = filtered_list, file = paste(args$outputdir, "/genotyped_samples.txt"), row.names = F, quote = F, col.names = F, sep = '\t') #write the new list to the old file
+write.table(x = filtered_list, file = paste(args$outputdir, "/genotyped_samples.txt", sep=""), row.names = F, quote = F, col.names = F, sep = '\t') #write the new list to the old file
