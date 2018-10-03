@@ -10,7 +10,7 @@ args <- parser$parse_args()
 sample_list <- read.table(args$samplelist,sep='\t',header=F) #read in the samples
 population_list <- read.table(args$snpgenotype,header=F,nrows=1) #read in the population pool
 population_list <- unlist(population_list[1,]) #convert population pool into vector
-if (ncol(samplelist) == 2){
+if (ncol(sample_list) == 2){
   filtered_list <- filter(sample_list,V2 %in% population_list) #remove any samples that are not in the population pool of our snps
 } else {
   filtered_list <- filter(sample_list,V1 %in% population_list) #remove any samples that are not in the population pool of our snps
