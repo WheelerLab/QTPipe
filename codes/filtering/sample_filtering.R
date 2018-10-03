@@ -4,7 +4,7 @@ library(argparse)
 parser <- ArgumentParser()
 parser$add_argument("-s", "--samplelist", help="file path of the sample list")
 parser$add_argument("-sg", "--snpgenotype", help="file path of the snp genotype file")
-parser$add_argument("-o", "--outputdir", help="output directory", type=)
+parser$add_argument("-o", "--outputdir", help="output directory")
 args <- parser$parse_args()
 
 sample_list <- read.table(args$samplelist,sep='\t',header=F) #read in the samples
