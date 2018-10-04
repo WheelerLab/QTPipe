@@ -5,7 +5,7 @@ import argparse
 import gzip
 import re
 from os.path import expanduser
-current = expanduser(".")
+current = expanduser("~")
 
 parser = argparse.ArgumentParser(description='Input & Output Files') #create the argument parser
 parser.add_argument('--VCF', help='The VCF file to open') #variable for VCF file
