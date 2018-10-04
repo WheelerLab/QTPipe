@@ -8,7 +8,6 @@ from os.path import expanduser
 current = expanduser(".")
 
 parser = argparse.ArgumentParser(description='Input & Output Files') #create the argument parser
-
 parser.add_argument('--VCF', help='The VCF file to open') #variable for VCF file
 parser.add_argument('--outputdir', "-o", default=current, help='The VCF file to open') #variable for VCF file
 args = parser.parse_args() #parse the arguments
