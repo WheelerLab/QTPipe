@@ -1,7 +1,6 @@
 library(dplyr)
 library(argparse)
-from os.path import expanduser
-current = expanduser(".")
+current = path.expand("~")
 
 parser <- ArgumentParser()
 parser$add_argument("-s", "--samplelist", help="file path of the sample list")
