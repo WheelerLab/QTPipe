@@ -4,9 +4,12 @@
 import argparse
 import gzip
 import re
-parser = argparse.ArgumentParser(description='Input & Output Files') #create the argument parser
+from os.path import expanduser
+current = expanduser("~")
 
+parser = argparse.ArgumentParser(description='Input & Output Files') #create the argument parser
 parser.add_argument('--VCF', help='The VCF file to open') #variable for VCF file
+parser.add_argument('--outputdir', "-o", default=current, help='The VCF file to open') #variable for VCF file
 args = parser.parse_args() #parse the arguments
 
 #geno = "SNPGenotypes_" + args.VCF
@@ -67,8 +70,8 @@ with gzip.open(args.VCF, "rt") as file: #open the vcf file
             loc_output.append(str(snp_id) + '\t' + "chr"+str(chrom_num) + '\t' + str(chrom_loc))
 	#write to output file
 
-geno = "/home/ryan/afa/SNPGenotypes_" + chrom_num + ".txt.gz"
-snpsloc = "/home/ryan/afa/SNPLoc_" + chrom_num + ".txt.gz"
+geno = args.outputdir + "SNPGenotypes.txt.gz"
+snpsloc = args.outputdir + "SNPLoc.txt.gz"
 
 with gzip.open(geno, 'wb') as output_file:
     samples = header.split('\t') #sample IDs
