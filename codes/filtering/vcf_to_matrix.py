@@ -9,6 +9,8 @@ current = expanduser("~")
 
 parser = argparse.ArgumentParser(description='Input & Output Files') #create the argument parser
 parser.add_argument('--VCF', help='The VCF file to open') #variable for VCF file
+parser.add_argument('--maf', help='Minor allele frequency threshold', const=1, type = float)
+parser.add_argument('--r2', help='R2 threshold', const=1, type = float)
 parser.add_argument('--outputdir', "-o", default=current, help='The VCF file to open') #variable for VCF file
 args = parser.parse_args() #parse the arguments
 
@@ -30,17 +32,25 @@ with gzip.open(args.VCF, "rt") as file: #open the vcf file
         chrom_loc = words[1] #grab chromosome location
         snp_id = words[2] #grab snp id
 	#loc_output.append(str(snp_id) + '\t' + "chr"+str(chrom_num) + '\t' + str(chrom_loc)) #append together for the location output file
-        
+        R2_index = -1
+	af_index = -1
         values = words[7].split(';') #grab the 7th column with GT info for each sample
         af_index = 2 #set initial allele freq to index 2	
-        if(str(values[2][0:3]) == 'AF='): #check first 3 indicies for AF info, because some snps are missing first 2 values
+        if(str(values[2][0:4]) == 'MAF='): #check first 3 indicies for AF info, because some snps are missing first 2 values
             af_index = 2
-        if(str(values[1][0:3]) == 'AF='):
+        if(str(values[1][0:4]) == 'MAF='):
             af_index = 1
-        if(str(values[0][0:3]) == 'AF='):
+        if(str(values[0][0:4]) == 'MAF='):
             af_index = 0
-        float_values = [float(i) for i in values[af_index][3:].split(',')]
-        if (max(float_values) >= 0.01): #check if AF is above 0.01 frequency
+	if(str(values[2][0:3]) == 'R2='): #check first 3 indicies for AF info, because some snps are missing first 2 values
+            R2_index = 2
+        if(str(values[1][0:3]) == 'R2='):
+            R2_index = 1
+        if(str(values[0][0:3]) == 'R2='):
+            R2_index = 0
+	R2_float = [float(i) for i in values[R2_index][3:].split(',')]
+        maf_float = [float(i) for i in values[af_index][3:].split(',')]
+        if (af_index != -1 and R2_index != -1) and (max(maf_float) >= args.maf and max(R2_float) >= args.R2): #check if AF is above 0.01 frequency
             unfiltered_geno = words[9:] #grab unfiltered genotype info
             genotypes = [] #create array for all genotype values to be stored
             #unfiltered_geno = unfiltered_geno[2:]
