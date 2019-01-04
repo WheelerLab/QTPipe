@@ -81,7 +81,9 @@ cd "${OutputDirectory}"
 
 cat "${SampleList}" | while read line #iterate through the list
 do
-	Sample=$( echo "${line}" | cut -f 1 -d$'\t' )
+	Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
+	temp=$( echo "${line}" | cut -f 2 -d$'\t' )
+	Sample="${temp:=$Fastq}"
 	echo Converting "${Sample}" associated Aligned.out.bam to "${Sample}.junc"
 	sh "${LeafcutterLoc}"/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}_star"/Aligned.out.bam "${OutputDirectory}"/"${Sample}.junc"
 	echo "${Sample}.junc" >> "${OutputDirectory}"/juncfiles.txt
