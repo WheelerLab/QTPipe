@@ -77,6 +77,11 @@ then
 	mkdir "${OutputDirectory}" # make a directory where the outputs will go - also update as an option
 fi 
 
+if [ -f "${OutputDirectory}"/juncfiles.txt ]
+then 
+	rm "${OutputDirectory}"/juncfiles.txt #rm existing text file
+fi 
+
 cd "${OutputDirectory}"
 
 cat "${SampleList}" | while read line #iterate through the list
