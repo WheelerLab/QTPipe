@@ -8,8 +8,8 @@ parser$add_argument("-ge", "--geneexpression", help="file path of the gene expre
 parser$add_argument("-gl", "--genelocation", help="file path of the gene location file")
 parser$add_argument("-t", "--tag", help="file tag for this run of samples")
 parser$add_argument("-o", "--outputdir", help="file tag for this run of samples", type="character", default="./")
-parser$add_argument("--cis", help="threshold for writing cis snp significance", type="double", default=2e-2)
-parser$add_argument("--trans", help="threshold for writing trans snp significance", type="double", default=1e-2)
+parser$add_argument("--cis", help="threshold for writing cis snp significance", type="double", default=1)
+parser$add_argument("--trans", help="threshold for writing trans snp significance", type="double", default=0)
 parser$add_argument("--window", help="maximum distance between snps to be considered cis", type="double", default=1e6)
 
 args <- parser$parse_args()
