@@ -1,0 +1,1 @@
+Genotype preprocessing and quality control is its own process, considered seperately from QTL analysis. The code used to perform genotype quality control can be found [here](https://github.com/RyanSchu/gwasqc_pipeline). The perform to prepare items for imputation can be found [here]() and the code used to parset this data into dosage format can be found [here]()
