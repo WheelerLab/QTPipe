@@ -1,0 +1,159 @@
+#!/bin/bash
+
+AlignmentOutDefault=~/StarAlignments/ #
+IndexDirectoryDefault=~/starIndex/ #
+ReadFilesInDefault=zcat
+RunIndexDefault=False #
+RunWASPDefault=False
+ThreadsDefault=6
+VCFfileDefault=~/Data/SNPdata/chr1-22.vcf.gz
+#option for are your files compressed - for us make defualt yes with zcat
+#option for genome fasta files for indexing - could provide a default for our purposes
+
+while :
+do
+    case "$1" in
+      -a | --annotation) #annotation file corresponding to the genome
+          AnnotationFile="$2"
+	  shift 2
+	  ;;
+      -g | --genomefasta) #file path to the genome files for indexing. Must be supplied when -ri is supplied
+          GenomeFiles="$2"
+	  shift 2
+	  ;;
+      -i | --inputdirectory) #directory containing the fastq files to be processed
+	  FastqDir="$2"  
+	  shift 2
+	  ;;
+      --indexdir) #when supplied alone, indexing has been run, and points to the index directory. When supplied with -ri, serves as output directory for indexing.
+	  IndexDirectory="$2"
+	  shift 2
+	  ;;
+      -o | --outputdirectory) #directory where you'd like to send all your alignments
+          AlignmentOut="$2"
+	  shift 2
+	  ;;
+      --runindex) #Only supplied if indexing has not been run. May be supplied with -id to name output directory. Must be supplied with -g genome files path (Right now only accepts 1 genome file).
+	  RunIndex=T
+	  shift 1
+	  ;;
+      -s | --samplelist) #list of samples you wish to process. Assumes samples are paired fastq files. Default is 10.
+	  SampleList="$2"
+	  shift 2
+	  ;;
+      -t | --threads) #number of threads you wish to use
+	  Threads="$2"
+	  shift 2
+	  ;;
+      --VCF) #file path to vcf file for wasp tag
+          VCFfile="$2"
+	  RunWASP=True
+          shift 2
+          ;;
+      --WASP | -W) #Run WASP with the default VCF
+          VCFfile="$2"
+	  RunWASP=True
+          shift 1
+          ;;
+      -*) #unknown 
+	  echo "Error: Unknown option: $1" >&2
+	  exit 1
+	  ;;
+      *)  # No more options
+	  shift
+	  break
+	  ;;
+     esac
+done
+
+
+#check: That all variables are set or default
+echo "Fastq directory is ${FastqDir:?not set}"
+echo "Annotation file is ${AnnotationFile:?not set}"
+echo "Sample List is ${SampleList:?not set}"
+echo "Using ${Threads:=$ThreadsDefault} cores"
+echo "Running WASP is ${RunWASP:=$RunWASPDefault}"
+if [ "${RunWASP}" = "True" ]
+then
+	echo "Using VCF file ${VCFfile:=$VCFfileDefault}"
+fi
+echo "Running indexing: ${RunIndex:=$RunIndexDefault}"
+echo "using indexing output of ${IndexDirectory:=$IndexDirectoryDefault}"
+echo "sending output to ${AlignmentOut:=$AlignmentOutDefault}"
+
+#verify the validity of required inputs
+if [ ! -d "${FastqDir}" ]
+then 
+	echo "Warning: ${FastqDir} DNE. Please supply input directory with -i argument"
+	echo "Exiting"
+	exit 1 
+fi
+if [ ! -e "${AnnotationFile}" ]
+then
+	echo "Warning: ${AnnotationFile} DNE. Please supply file with -a argument"
+	echo "Exiting"
+	exit 1
+fi
+if [ ! -e "${SampleList}" ]
+then
+	echo "Warning: ${SampleList} DNE. Please supply file with -s argument"
+	echo "Exiting"
+	exit 1
+fi
+if [ "${RunWASP}" = "True" ] && [ ! -e "${VCFfile}" ] || [ "${RunWASP}" = "True" ] && [ -z "${VCFfile}" ]
+then
+	echo "Warning: Attempting to run WASP but VCF file unset or DNE. Please supply a valid VCF file with --VCF" 
+	echo "Exiting."
+	exit 1
+fi
+
+#run index or not
+case "${RunIndex}" in 
+	False | F)
+		if [ ! -d "${IndexDirectory}" ] #check: if not running indexing, then index must exist
+		then
+			echo "Warning: Indexing files not supplied and indexing not being run"
+			echo "Please provide either indexing files or run indexing"
+			echo "Exiting"
+			exit 1
+		fi
+		;;
+	True | T)
+		if [ -z "${GenomeFiles}" ] #check: if running indexing, genome files must be provided
+		then
+			echo "Warning: Indexing being run without genome files"
+			echo "Please supply genome files with -g argument"
+			echo "Exiting"
+			exit 1
+		fi
+		if [ ! -d "${IndexDirectory}" ]  #should seriously consider a warning for if this directory already exists
+		then
+			mkdir "${IndexDirectory}"
+		fi
+		STAR --runMode genomeGenerate --genomeDir "${IndexDirectory}" --genomeFastaFiles "${GenomeFiles}" --runThreadN "${Threads}"
+		;;
+esac
+
+
+#now perform the actual alignment
+if [ ! -d "${AlignmentOut}" ]
+then
+	mkdir "${AlignmentOut}"
+fi
+cat "${SampleList}" | while read line #iterate through the list
+do
+	Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
+	temp=$( echo "${line}" | cut -f 2 -d$'\t' )
+	Sample="${temp:=$Fastq}"
+	if [ ! -d "${AlignmentOut}"/"${Sample}_star" ] 
+	then
+		mkdir "${AlignmentOut}"/"${Sample}_star" #make the directory
+	fi
+	cd "${AlignmentOut}"/"${Sample}_star" #go to that directory
+	if [ "${RunWASP}" = "True" ]
+	then
+		/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}_"*.fastq.gz --readFilesCommand zcat --waspOutputMode SAMtag --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}" --varVCFfile <(zcat "${VCFfile}") --outSAMattributes vW
+	else
+		/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}_"*.fastq.gz --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}"
+	fi
+done

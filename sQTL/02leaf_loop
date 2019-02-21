@@ -1,0 +1,101 @@
+#!/bin/bash
+
+LeafcutterLocDefault=~/software/leafcutter/
+LengthMaximumDefault=100000
+MinimumClusteringDefault=30
+OutputDirectoryDefault=~/leaf_out/
+OutputPrefixDefault=leafcutter
+PCDefault=10
+RatioMinimumDefault=0.001
+
+while :
+do
+    case "$1" in
+      -i | --inputdirectory) #Directory containing the star alignment files (assumes individual sample directories)
+      	  InputDirectory="$2"
+	  shift 2
+	  ;;
+      -l | --lengthmaximum) #maximum length of introns to be used in clustering
+      	  LengthMaximum="$2"
+	  shift 2
+	  ;;
+      -m | --minimumclustering) #Minimum number of reads that define a cluster
+      	  MinimumClustering="$2"
+	  shift 2
+	  ;;
+      -p | --prefix) #prefix of output
+      	  OutputPrefix="$2"
+	  shift 2
+	  ;;
+      -pc | --principalcomponents) #How many PCs do you wish to generate
+	  PC="$2"
+	  shift 2
+	  ;;
+      -o | --outputdir) #write leafcutter clustering to this directory
+      	  OutputDirectory="$2"
+	  shift 2
+      	  ;;
+      -r | --ratiominimum) #The minimum ratio of reads that must map to support a cluster
+      	  RatioMinimum="$2"
+	  shift 2
+	  ;;
+      -s | --samplelist) 
+      	  SampleList="$2"
+	  shift 2
+	  ;;
+      -*) #unknown 
+	  echo "Error: Unknown option: $1" >&2
+	  exit 1
+	  ;;
+      *)  # No more options
+	  shift
+	  break
+	  ;;
+     esac
+done
+
+
+
+#check: That all variables are set or default
+echo "Using input alignments located in ${InputDirectory:?not set}"
+echo "Using sample list ${SampleList:?not set}"
+echo "Writing output to ${OutputDirectory:=$OutputDirectoryDefault}"
+echo "Using maximum intron length of ${LengthMaximum:=$LengthMaximumDefault}"
+echo "Using minimum mapping support of ${MinimumClustering:=$MinimumClusteringDefault}"
+echo "Using minimum proportion support of ${RatioMinimum:=$RatioMinimumDefault}"
+echo "Using counts tag of ${OutputPrefix:=$OutputPrefixDefault}"
+echo "Calculating ${PC:=$PCDefault} PC(s)"
+echo "using leafcutter installed @ ${LeafcutterLoc:=$LeafcutterLocDefault}"
+
+
+PATH=$PATH:"${LeafcutterLoc}"/scripts
+
+#should add a check for if a particular sample has already had junction files made for it and skip it
+
+if [ ! -d "${OutputDirectory}" ]
+then 
+	mkdir "${OutputDirectory}" # make a directory where the outputs will go - also update as an option
+fi 
+
+if [ -f "${OutputDirectory}"/juncfiles.txt ]
+then 
+	rm "${OutputDirectory}"/juncfiles.txt #rm existing text file
+fi 
+
+cd "${OutputDirectory}"
+
+cat "${SampleList}" | while read line #iterate through the list
+do
+	Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
+	temp=$( echo "${line}" | cut -f 2 -d$'\t' )
+	Sample="${temp:=$Fastq}"
+	echo Converting "${Sample}" associated Aligned.out.bam to "${Sample}.junc"
+	sh "${LeafcutterLoc}"/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}_star"/Aligned.out.bam "${OutputDirectory}"/"${Sample}.junc"
+	echo "${Sample}.junc" >> "${OutputDirectory}"/juncfiles.txt
+done
+
+python "${LeafcutterLoc}"/clustering/leafcutter_cluster.py -j "${OutputDirectory}"/juncfiles.txt -m "${MinimumClustering}" -o "${OutputPrefix}" -l "${LengthMaximum}" -r "${OutputDirectory}" -p "${RatioMinimum}"
+zcat "${OutputDirectory}"/"${OutputPrefix}_perind.counts.gz" | grep "chr" | grep -v "M" > "${OutputDirectory}"/"${OutputPrefix}"_filtered_perind.counts #filtering step - removes unmapped loci that woukld break leafcutter
+gzip "${OutputPrefix}"_filtered_perind.counts
+#note this line requires full path
+/usr/local/bin/anaconda2/bin/python "${LeafcutterLoc}"/scripts/prepare_phenotype_table.py "${OutputDirectory}"/"${OutputPrefix}"_filtered_perind.counts.gz -p "${PC}"
