@@ -26,13 +26,17 @@ write.table(file = "~/mets_analysis/normalized_expression/" %&% args$tag %&% ".t
 #rownames(rn.qn.expmat) <- expr[,1]
 #colnames(rn.qn.expmat) <- colnames(expr)[-1]
 #write.table(file = "~/mets_analysis/normalized_expression/rank_normalized_splicing_chr" %&% args$tag %&% ".txt.gz", x = rn.qn.expmat, quote = F, sep = '\t')
-#covs = as.matrix(read.table(args$cov,header=T, row.names = 1))
-#covs<-as.matrix(as.numeric(covs))
+if (!is.null(args$cov){
+  covs = as.matrix(read.table(args$cov,header=T, row.names = 1))
+  covs<-as.matrix(as.numeric(covs))
+ }
   ## i is number of peer factors to calculate, recommend 25% of sample size, but no more than 100
 for(i in c(10,15,20)){
     model = PEER()
     PEER_setPhenoMean(model, qn.expmat)
-    #PEER_setCovariates(model, as.matrix(covs))
+    if (!is.null(args$cov){
+      PEER_setCovariates(model, as.matrix(covs))
+    }  
     PEER_setNk(model,i)
     PEER_update(model)
     factors = PEER_getX(model)
