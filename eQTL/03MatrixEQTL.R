@@ -8,6 +8,7 @@ parser$add_argument("-ge", "--geneexpression", help="file path of the gene expre
 parser$add_argument("-gl", "--genelocation", help="file path of the gene location file")
 parser$add_argument("-t", "--tag", help="file tag for this run of samples")
 parser$add_argument("-o", "--outputdir", help="file tag for this run of samples", type="character", default="./")
+parser$add_argument("--cov", help="file path to covariates file for MEQTL")
 parser$add_argument("--cis", help="threshold for writing cis snp significance", type="double", default=1)
 parser$add_argument("--trans", help="threshold for writing trans snp significance", type="double", default=0)
 parser$add_argument("--window", help="maximum distance between snps to be considered cis", type="double", default=1e6)
@@ -29,7 +30,12 @@ gene_location_file_name = args$genelocation;
 
 # Covariates file name
 # Set to character() for no covariates
-covariates_file_name = character();
+if (!is.null(args$cov)){
+  covariates_file_name = args$cov;
+} else {
+  covariates_file_name = character();
+}
+
 
 # Output file name
 output_file_name_cis = tempfile();
@@ -71,9 +77,8 @@ cvrt$fileDelimiter = "\t"; # the TAB character
 cvrt$fileOmitCharacters = "-1"; # denote missing values;
 cvrt$fileSkipRows = 1; # one row of column labels
 cvrt$fileSkipColumns = 1; # one column of row labels
-if(length(covariates_file_name)>0) {
-  cvrt$LoadFile(covariates_file_name);
-}
+cvrt$LoadFile(covariates_file_name);
+
 
 ## Run the analysis
 print("SNP")
