@@ -7,6 +7,7 @@ OutputDirectoryDefault=~/leaf_out/
 OutputPrefixDefault=leafcutter
 PCDefault=10
 RatioMinimumDefault=0.001
+RunWASPDefault=False
 
 while :
 do
@@ -43,6 +44,10 @@ do
       	  SampleList="$2"
 	  shift 2
 	  ;;
+      --WASP | -W) #Star has been run with wasp and Aligned.WASP.filtered.bam files have been generated (assumes they are in the same dir as the star alignment files
+	  RunWASP=True
+          shift 1
+          ;;
       -*) #unknown 
 	  echo "Error: Unknown option: $1" >&2
 	  exit 1
@@ -65,7 +70,8 @@ echo "Using minimum mapping support of ${MinimumClustering:=$MinimumClusteringDe
 echo "Using minimum proportion support of ${RatioMinimum:=$RatioMinimumDefault}"
 echo "Using counts tag of ${OutputPrefix:=$OutputPrefixDefault}"
 echo "Calculating ${PC:=$PCDefault} PC(s)"
-echo "using leafcutter installed @ ${LeafcutterLoc:=$LeafcutterLocDefault}"
+echo "Using leafcutter installed @ ${LeafcutterLoc:=$LeafcutterLocDefault}"
+echo "Using WASP filtered files is ${RunWASP:=RunWASPDefault}"
 
 
 PATH=$PATH:"${LeafcutterLoc}"/scripts
@@ -89,9 +95,26 @@ do
 	Fastq=$( echo "${line}" | cut -f 1 -d$'\t' )
 	temp=$( echo "${line}" | cut -f 2 -d$'\t' )
 	Sample="${temp:=$Fastq}"
-	echo Converting "${Sample}" associated Aligned.out.bam to "${Sample}.junc"
-	sh "${LeafcutterLoc}"/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}_star"/Aligned.out.bam "${OutputDirectory}"/"${Sample}.junc"
-	echo "${Sample}.junc" >> "${OutputDirectory}"/juncfiles.txt
+	if [ "${RunWASP}" = "True" ]
+	then	
+		if [ -e "${InputDirectory}"/"${Sample}"/Aligned.WASP.filtered.bam ]
+		then
+			echo Converting "${Sample}" associated Aligned.WASP.filtered.bam to "${Sample}.junc"
+			sh "${LeafcutterLoc}"/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}_star"/Aligned.WASP.filtered.bam "${OutputDirectory}"/"${Sample}.junc"
+			echo "${Sample}.junc" >> "${OutputDirectory}"/juncfiles.txt
+		else 
+			echo "${InputDirectory}/${Sample}/Aligned.WASP.filtered.bam does not exist. Double check input directory and/or sample list"
+		fi
+	else
+		if [ -e "${InputDirectory}"/"${Sample}"/Aligned.out.bam ]
+		then
+			echo Converting "${Sample}" associated Aligned.out.bam to "${Sample}.junc"
+			sh "${LeafcutterLoc}"/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}_star"/Aligned.out.bam "${OutputDirectory}"/"${Sample}.junc"
+			echo "${Sample}.junc" >> "${OutputDirectory}"/juncfiles.txt
+		else 
+			echo "${InputDirectory}/${Sample}/Aligned.out.bam does not exist. Double check input directory and/or sample list"
+		fi
+	fi	
 done
 
 python "${LeafcutterLoc}"/clustering/leafcutter_cluster.py -j "${OutputDirectory}"/juncfiles.txt -m "${MinimumClustering}" -o "${OutputPrefix}" -l "${LengthMaximum}" -r "${OutputDirectory}" -p "${RatioMinimum}"
