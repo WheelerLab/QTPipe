@@ -77,7 +77,9 @@ cvrt$fileDelimiter = "\t"; # the TAB character
 cvrt$fileOmitCharacters = "-1"; # denote missing values;
 cvrt$fileSkipRows = 1; # one row of column labels
 cvrt$fileSkipColumns = 1; # one column of row labels
-cvrt$LoadFile(covariates_file_name);
+if (!is.null(args$cov)){
+  cvrt$LoadFile(covariates_file_name);
+} 
 
 
 ## Run the analysis
