@@ -6,7 +6,6 @@ ReadFilesInDefault=zcat
 RunIndexDefault=False #
 RunWASPDefault=False
 ThreadsDefault=6
-VCFfileDefault=~/Data/SNPdata/chr1-22.vcf.gz
 #option for are your files compressed - for us make defualt yes with zcat
 #option for genome fasta files for indexing - could provide a default for our purposes
 
@@ -45,13 +44,13 @@ do
 	  Threads="$2"
 	  shift 2
 	  ;;
-      --VCF) #file path to vcf file for wasp tag
-          VCFfile="$2"
+      --VCF) #file path to vcf directory for wasp tag
+          VCFdir="$2"
 	  RunWASP=True
           shift 2
           ;;
       --WASP | -W) #Run WASP with the default VCF
-          VCFfile="$2"
+          VCFdir="$2"
 	  RunWASP=True
           shift 1
           ;;
@@ -73,9 +72,10 @@ echo "Annotation file is ${AnnotationFile:?not set}"
 echo "Sample List is ${SampleList:?not set}"
 echo "Using ${Threads:=$ThreadsDefault} cores"
 echo "Running WASP is ${RunWASP:=$RunWASPDefault}"
-if [ "${RunWASP}" = "True" ]
+if [ "${RunWASP}" = "True" ] && [ ! -d "${VCFdir}" ] || [ "${RunWASP}" = "True" ] && [ -z "${VCFdir}" ]
 then
-	echo "Using VCF file ${VCFfile:=$VCFfileDefault}"
+	echo "VCF directory not found but attempting to run WASP. Please supply valid VCF directory using the --VCF flag"
+	exit 1
 fi
 echo "Running indexing: ${RunIndex:=$RunIndexDefault}"
 echo "using indexing output of ${IndexDirectory:=$IndexDirectoryDefault}"
@@ -100,12 +100,12 @@ then
 	echo "Exiting"
 	exit 1
 fi
-if [ "${RunWASP}" = "True" ] && [ ! -e "${VCFfile}" ] || [ "${RunWASP}" = "True" ] && [ -z "${VCFfile}" ]
-then
-	echo "Warning: Attempting to run WASP but VCF file unset or DNE. Please supply a valid VCF file with --VCF" 
-	echo "Exiting."
-	exit 1
-fi
+#if [ "${RunWASP}" = "True" ] && [ ! -e "${VCFfile}" ] || [ "${RunWASP}" = "True" ] && [ -z "${VCFfile}" ]
+#then
+#	echo "Warning: Attempting to run WASP but VCF file unset or DNE. Please supply a valid VCF file with --VCF" 
+#	echo "Exiting."
+#	exit 1
+#fi
 
 #run index or not
 case "${RunIndex}" in 
@@ -152,7 +152,7 @@ do
 	cd "${AlignmentOut}"/"${Sample}_star" #go to that directory
 	if [ "${RunWASP}" = "True" ]
 	then
-		/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}_"*.fastq.gz --readFilesCommand zcat --waspOutputMode SAMtag --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}" --varVCFfile <(zcat "${VCFfile}") --outSAMattributes NH HI AS nM NM MD vA vG vW
+		/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}_"*.fastq.gz --readFilesCommand zcat --waspOutputMode SAMtag --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}" --varVCFfile <(zcat "${VCFdir}"/${Sample}.vcf.gz) --outSAMattributes NH HI AS nM NM MD vA vG vW
 		/usr/bin/samtools view -h Aligned.out.bam | grep -v -E 'vW:i:2|vW:i:3|vW:i:4|vW:i:5|vW:i:6|vW:i:7' | /usr/bin/samtools view -h -o Aligned.WASP.filtered.bam -b
 	else
 		/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}_"*.fastq.gz --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}"
