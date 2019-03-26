@@ -152,7 +152,7 @@ do
 	cd "${AlignmentOut}"/"${Sample}_star" #go to that directory
 	if [ "${RunWASP}" = "True" ]
 	then
-		/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}_"*.fastq.gz --readFilesCommand zcat --waspOutputMode SAMtag --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}" --varVCFfile <(zcat "${VCFdir}"/${Sample}.vcf.gz) --outSAMattributes NH HI AS nM NM MD vA vG vW
+		/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}_"*.fastq.gz --readFilesCommand zcat --waspOutputMode SAMtag --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}" --varVCFfile "${VCFdir}"/${Sample}_hg38_cpos.vcf --outSAMattributes NH HI AS nM NM MD vA vG vW
 		/usr/bin/samtools view -h Aligned.out.bam | grep -v -E 'vW:i:2|vW:i:3|vW:i:4|vW:i:5|vW:i:6|vW:i:7' | /usr/bin/samtools view -h -o Aligned.WASP.filtered.bam -b
 	else
 		/usr/local/bin/STAR --genomeDir "${IndexDirectory}" --sjdbGTFfile "${AnnotationFile}" --readFilesIn "${FastqDir}"/"${Fastq:=$Sample}_"*.fastq.gz --readFilesCommand zcat --quantMode TranscriptomeSAM --outSAMtype BAM Unsorted --runThreadN "${Threads}"
