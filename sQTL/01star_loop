@@ -49,8 +49,7 @@ do
 	  RunWASP=True
           shift 2
           ;;
-      --WASP | -W) #Run WASP with the default VCF
-          VCFdir="$2"
+      --WASP | -W) #Run WASP
 	  RunWASP=True
           shift 1
           ;;
