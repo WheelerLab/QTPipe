@@ -100,7 +100,7 @@ do
 		if [ -e "${InputDirectory}"/"${Sample}"/Aligned.WASP.filtered.bam ]
 		then
 			echo Converting "${Sample}" associated Aligned.WASP.filtered.bam to "${Sample}.junc"
-			sh "${LeafcutterLoc}"/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}_star"/Aligned.WASP.filtered.bam "${OutputDirectory}"/"${Sample}.junc"
+			sh "${LeafcutterLoc}"/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}"/Aligned.WASP.filtered.bam "${OutputDirectory}"/"${Sample}.junc"
 			echo "${Sample}.junc" >> "${OutputDirectory}"/juncfiles.txt
 		else 
 			echo "${InputDirectory}/${Sample}/Aligned.WASP.filtered.bam does not exist. Double check input directory and/or sample list"
@@ -109,7 +109,7 @@ do
 		if [ -e "${InputDirectory}"/"${Sample}"/Aligned.out.bam ]
 		then
 			echo Converting "${Sample}" associated Aligned.out.bam to "${Sample}.junc"
-			sh "${LeafcutterLoc}"/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}_star"/Aligned.out.bam "${OutputDirectory}"/"${Sample}.junc"
+			sh "${LeafcutterLoc}"/scripts/bam2junc.sh "${InputDirectory}"/"${Sample}"/Aligned.out.bam "${OutputDirectory}"/"${Sample}.junc"
 			echo "${Sample}.junc" >> "${OutputDirectory}"/juncfiles.txt
 		else 
 			echo "${InputDirectory}/${Sample}/Aligned.out.bam does not exist. Double check input directory and/or sample list"
