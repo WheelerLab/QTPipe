@@ -20,13 +20,13 @@ qn.expmat <- as.matrix(normalize.quantiles(expmat)) ##quantile normalize
 qn<-as.matrix(t(qn.expmat))
 rownames(qn) <- expr[,1]
 colnames(qn) <- colnames(expr)[-1]
-write.table(file = "~/mets_analysis/normalized_expression/" %&% args$tag %&% ".txt", x = qn, quote = F, sep = '\t')
+write.table(file = args$outputdir %&% "/" %&% args$tag %&% "QN.txt", x = qn, quote = F, sep = '\t')
 
 #rn.qn.expmat <- apply(qn.expmat,1,"rntransform") ##rank transform to normality & transposes##
 #rownames(rn.qn.expmat) <- expr[,1]
 #colnames(rn.qn.expmat) <- colnames(expr)[-1]
 #write.table(file = "~/mets_analysis/normalized_expression/rank_normalized_splicing_chr" %&% args$tag %&% ".txt.gz", x = rn.qn.expmat, quote = F, sep = '\t')
-if (!is.null(args$cov){
+if (!is.null(args$cov)){
   covs = as.matrix(read.table(args$cov,header=T, row.names = 1))
   covs<-as.matrix(as.numeric(covs))
  }
@@ -34,7 +34,7 @@ if (!is.null(args$cov){
 for(i in c(10,15,20)){
     model = PEER()
     PEER_setPhenoMean(model, qn.expmat)
-    if (!is.null(args$cov){
+    if (!is.null(args$cov)){
       PEER_setCovariates(model, as.matrix(covs))
     }  
     PEER_setNk(model,i)
